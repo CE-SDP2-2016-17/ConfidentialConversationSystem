@@ -57,7 +57,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Intent i =  new Intent(this, UserListActivity.class);
+        //Intent i =  new Intent(this, UserListActivity.class);
+        Intent i =  new Intent(this, DisplayContactActivity.class);
         startActivity(i);
     }
 

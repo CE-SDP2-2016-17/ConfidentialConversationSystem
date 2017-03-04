@@ -3,6 +3,8 @@
     package="com.example.imdhv.blumed">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -27,8 +29,9 @@
         <activity android:name=".RegisterActivity" />
         <activity
             android:name=".LoginReadyActivity"
-            android:label="@string/title_activity_login_ready"></activity>
-        <activity android:name=".UserDetailActivity"></activity>
+            android:label="@string/title_activity_login_ready" />
+        <activity android:name=".UserDetailActivity" />
+        <activity android:name=".DisplayContactActivity"></activity>
     </application>
 
 </manifest>
