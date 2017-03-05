@@ -2,11 +2,14 @@ package com.example.imdhv.blumed;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -15,12 +18,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class DisplayContactActivity extends AppCompatActivity {
 
     ListView lv;
     ArrayList<String> arrlistnames = new ArrayList<String>();
     ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
+    ArrayList<String> commonNames=new ArrayList<String>();
+    ArrayList<String> commonNumbers=new ArrayList<String>();
+    ArrayList<String> commonNames1=new ArrayList<String>();
+    ArrayList<String> commonNumbers1=new ArrayList<String>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +44,7 @@ public class DisplayContactActivity extends AppCompatActivity {
 
     class MyTask extends AsyncTask<String, String, String>{
         ProgressDialog pd;
+        String s1;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -49,7 +62,42 @@ public class DisplayContactActivity extends AppCompatActivity {
             if(pd!=null){
                 pd.dismiss();
             }
-            ArrayAdapter<String> aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, arrlistphonenumbers);
+            Toast.makeText(DisplayContactActivity.this, s, Toast.LENGTH_LONG).show();
+
+            try {
+                JSONArray arr = new JSONArray(s);
+                for(int i = 0; i <arr.length(); i++) {
+                    commonNames.add(arrlistnames.get(arr.getInt(i)));
+                    commonNumbers.add(arrlistphonenumbers.get(arr.getInt(i)));
+                }
+                try{
+                    SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",MODE_PRIVATE,null);
+                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name varchar(),Number varchar(10))");
+                    int size=commonNames.size();
+                    for(int i=0;i<size;i++)
+                    {
+                        ContentValues cv = new ContentValues();
+                        cv.put("Name",commonNames.get(i));
+                        cv.put("Number",commonNumbers.get(i));
+                        database.insertOrThrow("USERS",null,cv);
+                    }
+                    Cursor resultSet = database.rawQuery("Select * from USERS",null);
+                    if(resultSet.moveToFirst()){
+                        do{
+                            commonNames1.add(resultSet.getString(0));
+                            commonNumbers1.add(resultSet.getString(1));
+                        }while (resultSet.moveToNext());
+                    }
+                }
+                catch(Exception e1){
+                    Log.e("",e1+"");
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ArrayAdapter<String> aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
             lv.setAdapter(aa);
         }
 
@@ -92,13 +140,19 @@ public class DisplayContactActivity extends AppCompatActivity {
                 }
             }
 
-            //arrlistphonenumbers.add(Integer.toString(arrlistnames.size()));
-            //arrlistphonenumbers.add(Integer.toString(arrlistphonenumbers.size()));
 
-            //String json = new Gson().toJson(arrlistphonenumbers);
+            //arrlistphonenumbers.add(Integer.toString(arrlistphonenumbers.size()));
+            //arrlistphonenumbers.add(Integer.toString(arrlistnames.size()));
             JSONArray jsArray = new JSONArray(arrlistphonenumbers);
-            String s = jsArray.toString();
-            return null;
+            s1 = jsArray.toString();
+            RequestPackage rp = new RequestPackage();
+            rp.setUri(Utility.serverurl);
+            rp.setParam("type", "getuserlist");
+            rp.setParam("json1",s1);
+            rp.setMethod("POST");
+            String ans = HttpManager.getData(rp);
+            return ans;
+            //return null;
         }
     }
 

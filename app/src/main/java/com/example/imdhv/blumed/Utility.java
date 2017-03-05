@@ -5,5 +5,5 @@ package com.example.imdhv.blumed;
  */
 
 public class Utility {
-    public static final String serverurl = "http://10.70.90.121/project1/androidsupport.php";
+    public static final String serverurl = "http://192.168.43.23/project1/androidsupport.php";
 }
