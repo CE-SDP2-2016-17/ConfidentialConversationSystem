@@ -43,7 +43,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.imdhv.blumed.HomeActivity2" />
         </activity>
-        <activity android:name=".CustomSettings"></activity>
+        <activity android:name=".CustomSettings" />
+        <activity
+            android:name=".NewMessageActivity"
+            android:label="@string/title_activity_new_message"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
