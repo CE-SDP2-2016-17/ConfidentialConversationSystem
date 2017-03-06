@@ -3,9 +3,12 @@ package com.example.imdhv.blumed;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -39,7 +42,28 @@ public class DisplayContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_contact);
         lv = (ListView) findViewById(R.id.lv1);
-        new MyTask().execute();
+        SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+        //database.execSQL("delete from USERS");
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        int caid = sp.getInt("caid", 0);
+        if(caid>0){
+            Cursor resultSet = database.rawQuery("Select * from USERS",null);
+            if(resultSet.moveToFirst()){
+                do{
+                    commonNames1.add(resultSet.getString(0));
+                    commonNumbers1.add(resultSet.getString(1));
+                }while (resultSet.moveToNext());
+            }
+            ArrayAdapter<String> aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+            lv.setAdapter(aa);
+
+        }
+        else {
+            new MyTask().execute();
+        }
+
+
     }
 
     class MyTask extends AsyncTask<String, String, String>{
@@ -62,7 +86,7 @@ public class DisplayContactActivity extends AppCompatActivity {
             if(pd!=null){
                 pd.dismiss();
             }
-            Toast.makeText(DisplayContactActivity.this, s, Toast.LENGTH_LONG).show();
+            //Toast.makeText(DisplayContactActivity.this, s, Toast.LENGTH_LONG).show();
 
             try {
                 JSONArray arr = new JSONArray(s);
@@ -71,8 +95,11 @@ public class DisplayContactActivity extends AppCompatActivity {
                     commonNumbers.add(arrlistphonenumbers.get(arr.getInt(i)));
                 }
                 try{
-                    SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",MODE_PRIVATE,null);
-                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name varchar(),Number varchar(10))");
+                    //SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",MODE_PRIVATE,null);
+
+                    //Toast.makeText(DisplayContactActivity.this, "table created ", Toast.LENGTH_LONG).show();
+                    SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT);");
                     int size=commonNames.size();
                     for(int i=0;i<size;i++)
                     {
@@ -91,12 +118,20 @@ public class DisplayContactActivity extends AppCompatActivity {
                 }
                 catch(Exception e1){
                     Log.e("",e1+"");
+                    Toast.makeText(DisplayContactActivity.this, "ERROR "+e1.toString(), Toast.LENGTH_LONG).show();
                 }
 
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                Toast.makeText(DisplayContactActivity.this, "ERROR "+e.toString(), Toast.LENGTH_LONG).show();
             }
+
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(DisplayContactActivity.this);
+            sp.edit().putInt("caid",2 ).apply();
+
+
+
+
             ArrayAdapter<String> aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
             lv.setAdapter(aa);
         }
@@ -124,9 +159,7 @@ public class DisplayContactActivity extends AppCompatActivity {
                         while (pCur.moveToNext()) {
                             String phoneNo = pCur.getString(pCur.getColumnIndex(
                                     ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            // Toast.makeText(this, "Name: " + name
-                            //       + ", Phone No: " + phoneNo, Toast.LENGTH_SHORT).show();
-                            //arrlistnames.add(name.replaceAll("\\s+","").trim());
+
                             String p = phoneNo.replaceAll("\\s+","").replaceAll("-","").trim();
                             if(p.length() >= 10) {
                                 if (!arrlistphonenumbers.contains(p.substring(p.length() - 10))) {
@@ -141,8 +174,7 @@ public class DisplayContactActivity extends AppCompatActivity {
             }
 
 
-            //arrlistphonenumbers.add(Integer.toString(arrlistphonenumbers.size()));
-            //arrlistphonenumbers.add(Integer.toString(arrlistnames.size()));
+
             JSONArray jsArray = new JSONArray(arrlistphonenumbers);
             s1 = jsArray.toString();
             RequestPackage rp = new RequestPackage();

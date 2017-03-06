@@ -2,6 +2,7 @@ package com.example.imdhv.blumed;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
                 sp.edit().putInt("userid", 0).apply();
+                sp.edit().putInt("caid",0).apply();
+                SQLiteDatabase database = HomeActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+                database.execSQL("delete from USERS");
                 Intent i = new Intent(this, LoginActivity.class);
                 startActivity(i);
                 finish();
