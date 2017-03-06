@@ -9,12 +9,21 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,30 +32,42 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class DisplayContactActivity extends AppCompatActivity {
+public class DisplayContactActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     ListView lv;
+    EditText et;
     ArrayList<String> arrlistnames = new ArrayList<String>();
     ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
     ArrayList<String> commonNames=new ArrayList<String>();
     ArrayList<String> commonNumbers=new ArrayList<String>();
     ArrayList<String> commonNames1=new ArrayList<String>();
     ArrayList<String> commonNumbers1=new ArrayList<String>();
+    ArrayAdapter<String> aa;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_contact);
+
         lv = (ListView) findViewById(R.id.lv1);
+
+        et = (EditText) findViewById(R.id.searchbox);
+        aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+
         SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
-        //database.execSQL("delete from USERS");
+
+
+
+
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         int caid = sp.getInt("caid", 0);
+
         if(caid>0){
             Cursor resultSet = database.rawQuery("Select * from USERS",null);
             if(resultSet.moveToFirst()){
@@ -55,7 +76,7 @@ public class DisplayContactActivity extends AppCompatActivity {
                     commonNumbers1.add(resultSet.getString(1));
                 }while (resultSet.moveToNext());
             }
-            ArrayAdapter<String> aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+            aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
             lv.setAdapter(aa);
 
         }
@@ -64,6 +85,37 @@ public class DisplayContactActivity extends AppCompatActivity {
         }
 
 
+
+        final ArrayAdapter<String> finalAa = aa;
+
+        et.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Listview name of the class
+                aa.getFilter().filter(s);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        lv.setOnItemClickListener(this);
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(DisplayContactActivity.this, Long.toString(id), Toast.LENGTH_SHORT).show();
     }
 
     class MyTask extends AsyncTask<String, String, String>{
@@ -131,9 +183,9 @@ public class DisplayContactActivity extends AppCompatActivity {
 
 
 
+            DisplayContactActivity.this.aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+            lv.setAdapter(DisplayContactActivity.this.aa);
 
-            ArrayAdapter<String> aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
-            lv.setAdapter(aa);
         }
 
         @Override
