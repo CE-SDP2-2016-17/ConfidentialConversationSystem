@@ -1,42 +1,37 @@
 package com.example.imdhv.blumed;
 
+
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.provider.SearchRecentSuggestions;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
-public class DisplayContactActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class ContactFragment extends Fragment {
+
 
     ListView lv;
     EditText et;
@@ -49,25 +44,26 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
     ArrayAdapter<String> aa;
 
 
+
+    public ContactFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_contact);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_contact, container, false);
 
-        lv = (ListView) findViewById(R.id.lv1);
+        lv = (ListView) v.findViewById(R.id.lvContacts);
+        et = (EditText) v.findViewById(R.id.searchbox);
+        aa = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+        SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+        //database.execSQL("delete from USERS");
 
-        et = (EditText) findViewById(R.id.searchbox);
-        aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
-
-        SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
-
-
-
-
-
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int caid = sp.getInt("caid", 0);
-
         if(caid>0){
             Cursor resultSet = database.rawQuery("Select * from USERS",null);
             if(resultSet.moveToFirst()){
@@ -76,7 +72,7 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
                     commonNumbers1.add(resultSet.getString(1));
                 }while (resultSet.moveToNext());
             }
-            aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+            aa = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
             lv.setAdapter(aa);
 
         }
@@ -86,45 +82,20 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
 
 
 
-        final ArrayAdapter<String> finalAa = aa;
 
-        et.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Listview name of the class
-                aa.getFilter().filter(s);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-        lv.setOnItemClickListener(this);
-
+        return v;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(DisplayContactActivity.this, Long.toString(id), Toast.LENGTH_SHORT).show();
-    }
 
-    class MyTask extends AsyncTask<String, String, String>{
+
+
+    class MyTask extends AsyncTask<String, String, String> {
         ProgressDialog pd;
         String s1;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pd= new ProgressDialog(DisplayContactActivity.this);
+            pd= new ProgressDialog(getActivity());
             pd.setIndeterminate(true);
             pd.setCancelable(false);
             pd.setTitle("Loading...");
@@ -138,7 +109,7 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
             if(pd!=null){
                 pd.dismiss();
             }
-            //Toast.makeText(DisplayContactActivity.this, s, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
 
             try {
                 JSONArray arr = new JSONArray(s);
@@ -147,10 +118,7 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
                     commonNumbers.add(arrlistphonenumbers.get(arr.getInt(i)));
                 }
                 try{
-                    //SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",MODE_PRIVATE,null);
-
-                    //Toast.makeText(DisplayContactActivity.this, "table created ", Toast.LENGTH_LONG).show();
-                    SQLiteDatabase database = DisplayContactActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+                    SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
                     database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT);");
                     int size=commonNames.size();
                     for(int i=0;i<size;i++)
@@ -170,27 +138,27 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
                 }
                 catch(Exception e1){
                     Log.e("",e1+"");
-                    Toast.makeText(DisplayContactActivity.this, "ERROR "+e1.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "ERROR "+e1.toString(), Toast.LENGTH_LONG).show();
                 }
 
 
             } catch (JSONException e) {
-                Toast.makeText(DisplayContactActivity.this, "ERROR "+e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "ERROR "+e.toString(), Toast.LENGTH_LONG).show();
             }
 
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(DisplayContactActivity.this);
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
             sp.edit().putInt("caid",2 ).apply();
 
 
 
-            DisplayContactActivity.this.aa = new ArrayAdapter<String>(DisplayContactActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
-            lv.setAdapter(DisplayContactActivity.this.aa);
 
+            ArrayAdapter<String> aa = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+            lv.setAdapter(aa);
         }
 
         @Override
         protected String doInBackground(String... params) {
-            ContentResolver cr = getContentResolver();
+            ContentResolver cr = getActivity().getContentResolver();
             Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                     null, null, null, null);
 
@@ -239,4 +207,6 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
             //return null;
         }
     }
+
+
 }

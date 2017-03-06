@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -31,7 +30,20 @@
             android:name=".LoginReadyActivity"
             android:label="@string/title_activity_login_ready" />
         <activity android:name=".UserDetailActivity" />
-        <activity android:name=".DisplayContactActivity"></activity>
+        <activity android:name=".DisplayContactActivity" />
+        <activity
+            android:name=".HomeActivity2"
+            android:label="@string/title_activity_home2"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".HomeActivity2">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.imdhv.blumed.HomeActivity2" />
+        </activity>
+        <activity android:name=".CustomSettings"></activity>
     </application>
 
 </manifest>

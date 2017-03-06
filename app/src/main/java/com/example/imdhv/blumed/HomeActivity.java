@@ -52,6 +52,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
+
         Button btnShowUsers = (Button) findViewById(R.id.btnShowUsers);
         btnShowUsers.setOnClickListener(this);
 
@@ -62,6 +64,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         //Intent i =  new Intent(this, UserListActivity.class);
+
         Intent i =  new Intent(this, DisplayContactActivity.class);
         startActivity(i);
     }

@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         int userid = sp.getInt("userid", 0);
         if(userid>0){
-            Intent i = new Intent(this, HomeActivity.class);
+            Intent i = new Intent(this, HomeActivity2.class);
             startActivity(i);
             finish();
         }
@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // edit it, put an int in it, and apply changes to store it permenantly
                 sp.edit().putInt("userid", value).apply();
 
-                Intent i = new Intent(LoginActivity.this, HomeActivity.class);
+                Intent i = new Intent(LoginActivity.this, HomeActivity2.class);
                 startActivity(i);
                 finish();
             }else{

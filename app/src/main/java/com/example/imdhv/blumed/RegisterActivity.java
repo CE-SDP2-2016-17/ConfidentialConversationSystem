@@ -88,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             rp.setParam("mobile", mobile);
 
 
-            rp.setMethod("GET");
+            rp.setMethod("POST");
             String ans = HttpManager.getData(rp);
             return ans;
         }

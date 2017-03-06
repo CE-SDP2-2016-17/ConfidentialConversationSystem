@@ -93,7 +93,7 @@ public class UserListActivity extends AppCompatActivity implements AdapterView.O
             RequestPackage rp = new RequestPackage();
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "getuserlist");
-            rp.setMethod("GET");
+            rp.setMethod("POST");
             String ans = HttpManager.getData(rp);
             return ans;
         }
