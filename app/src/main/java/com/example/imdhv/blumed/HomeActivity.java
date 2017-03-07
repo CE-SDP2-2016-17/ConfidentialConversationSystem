@@ -27,6 +27,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
                 sp.edit().putInt("userid", 0).apply();
                 sp.edit().putInt("caid",0).apply();
+                sp.edit().putString("mobile","").apply();
                 SQLiteDatabase database = HomeActivity.this.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
                 database.execSQL("delete from USERS");
                 Intent i = new Intent(this, LoginActivity.class);

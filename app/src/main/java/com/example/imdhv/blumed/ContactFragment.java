@@ -12,10 +12,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ContactFragment extends Fragment {
+public class ContactFragment extends Fragment implements AdapterView.OnItemClickListener {
 
 
     ListView lv;
@@ -58,7 +61,9 @@ public class ContactFragment extends Fragment {
 
         lv = (ListView) v.findViewById(R.id.lvContacts);
         et = (EditText) v.findViewById(R.id.searchbox);
+
         aa = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+
         SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
         //database.execSQL("delete from USERS");
 
@@ -76,17 +81,45 @@ public class ContactFragment extends Fragment {
             lv.setAdapter(aa);
 
         }
-        else {
-            new MyTask().execute();
-        }
+        //else {
+        //    new MyTask().execute();
+        //}
+        final ArrayAdapter<String> finalAa = aa;
 
+        et.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Listview name of the class
+                aa.getFilter().filter(s);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        lv.setOnItemClickListener(this);
 
 
 
         return v;
     }
 
-
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String name = (String) parent.getItemAtPosition(position);
+        Integer id1 = (Integer)view.getTag();
+        Toast.makeText(getActivity(), Integer.toString(id1), Toast.LENGTH_SHORT).show();
+    }
 
 
     class MyTask extends AsyncTask<String, String, String> {

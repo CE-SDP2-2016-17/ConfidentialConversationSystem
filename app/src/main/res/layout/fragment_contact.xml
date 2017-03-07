@@ -5,13 +5,20 @@
     tools:context="com.example.imdhv.blumed.ContactFragment">
 
     <!-- TODO: Update blank fragment layout -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textAutoComplete"
+        android:imeOptions="actionSearch"
 
+        android:id="@+id/searchbox"
+        />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/lvContacts"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/searchbox" />
 </RelativeLayout>

@@ -115,7 +115,9 @@ public class DisplayContactActivity extends AppCompatActivity implements Adapter
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(DisplayContactActivity.this, Long.toString(id), Toast.LENGTH_SHORT).show();
+        String name = (String) parent.getItemAtPosition(position);
+        Integer id1 = (Integer)view.getTag();
+        Toast.makeText(DisplayContactActivity.this, Integer.toString(id1), Toast.LENGTH_SHORT).show();
     }
 
     class MyTask extends AsyncTask<String, String, String>{

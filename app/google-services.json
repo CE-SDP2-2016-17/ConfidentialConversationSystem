@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "404220775225",
+    "firebase_url": "https://blumed-2faa1.firebaseio.com",
+    "project_id": "blumed-2faa1",
+    "storage_bucket": "blumed-2faa1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404220775225:android:58e9657de619b169",
+        "android_client_info": {
+          "package_name": "com.example.imdhv.blumed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "404220775225-agm4v2h4oh2qe9a262s6vq642p9d48v7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.imdhv.blumed",
+            "certificate_hash": "b4f5fcab2f92cb08e27a5946aa7879e443f941d9"
+          }
+        },
+        {
+          "client_id": "404220775225-5hcfg2i0e3hqml977dfkk3te4rqtnu74.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFLtY4X8ZY0g0Mqkq_l7ZZZuWg8tau5qs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "404220775225-5hcfg2i0e3hqml977dfkk3te4rqtnu74.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
