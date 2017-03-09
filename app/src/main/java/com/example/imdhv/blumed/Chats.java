@@ -1,12 +1,15 @@
 package com.example.imdhv.blumed;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 /**
@@ -28,13 +31,61 @@ public class Chats extends Fragment {
     }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
+        SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+
+        Cursor resultSet = database.rawQuery("Select * from MESSAGE", null);
+
+        if (resultSet.moveToFirst()) {
+            do {
+                String a = resultSet.getString(0);
+                String ba = resultSet.getString(1);
+                String b = resultSet.getString(2);
+                String c = resultSet.getString(3);
+                String d = resultSet.getString(4);
+                String e = resultSet.getString(5);
+                String f = resultSet.getString(6);
+                Toast.makeText(getActivity(), a + " " + ba + b + c + d + e + f, Toast.LENGTH_LONG).show();
+            }
+            while (resultSet.moveToNext());
+
+
+
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chats, container, false);
+        View v = inflater.inflate(R.layout.fragment_chats, container, false);
+
+        SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+
+        Cursor resultSet = database.rawQuery("Select * from MESSAGE", null);
+
+        if (resultSet.moveToFirst()) {
+            do {
+                String a = resultSet.getString(0);
+                String ba = resultSet.getString(1);
+                String b = resultSet.getString(2);
+                String c = resultSet.getString(3);
+                String d = resultSet.getString(4);
+                String e = resultSet.getString(5);
+                String f = resultSet.getString(6);
+                Toast.makeText(getActivity(), a + " " + ba + b + c + d + e + f, Toast.LENGTH_LONG).show();
+            }
+            while (resultSet.moveToNext());
+
+
+
+        }
+
+
+        return v;
     }
 
 
