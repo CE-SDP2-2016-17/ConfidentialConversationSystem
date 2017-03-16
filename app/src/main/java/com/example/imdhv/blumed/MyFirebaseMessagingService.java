@@ -1,6 +1,7 @@
 package com.example.imdhv.blumed;
 
 import android.app.Service;
+import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,6 +19,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        Chats c;
         // TODO(developer): Handle FCM messages here.
         // If the application is in the foreground handle both data and notification messages here.
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -27,7 +29,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String msgobj = remoteMessage.getData().get("newmessage");
         //Log.e("FCM MSG", "Notification Message Body: " + msgobj);
 
-
+        //ContentProvider
+        //c.onCreateView()
         try {
             JSONArray arr = new JSONArray(msgobj);
             SQLiteDatabase database = openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
@@ -56,12 +59,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("fcm","What the hell!");
+
 
 
 
         }
-        Log.e("FCM MSG", "Done Baby!");
+
 
     }
 }
