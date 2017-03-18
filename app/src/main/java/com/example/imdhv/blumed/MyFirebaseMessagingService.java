@@ -37,7 +37,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         try {
             JSONArray arr = new JSONArray(msgobj);
             SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-            database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text);");
+            database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 String frommobile = obj.get("frommobile").toString();
@@ -56,6 +56,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 cv.put("creationtime", creationtime);
                 cv.put("senderttl", senderttl);
                 cv.put("status", status);
+                cv.put("action","r");
                 database.insertOrThrow("MESSAGE", null, cv);
 
             }

@@ -1,6 +1,7 @@
 package com.example.imdhv.blumed;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,6 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +40,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView chatName;
     BroadcastReceiver receiver;
     int id=1;
-    String rpdata,rptype,rpttl;
+    String rpdata,rptype,rpttl="5";
 
     SharedPreferences sp;
     String number,name,mynumber;
@@ -59,10 +64,11 @@ public class ChatActivity extends AppCompatActivity {
                 String a = resultSet.getString(0);
                 String ba = resultSet.getString(1);
                 String b = resultSet.getString(2);
-                String c = resultSet.getString(3) + " " + id;
+                String c = resultSet.getString(3);
                 String d = resultSet.getString(4);
                 String e = resultSet.getString(5);
                 String f = resultSet.getString(6);
+                String g = resultSet.getString(7);
                 ChatMessage chatMessage = new ChatMessage();
 
 
@@ -73,7 +79,11 @@ public class ChatActivity extends AppCompatActivity {
                 Date d1 = new Date();
                 d1.setTime((long)(Long.parseLong(d)*1000));
                 chatMessage.setDate((d1.toString()).substring(0,20));
-                chatMessage.setMe(false);
+                if(g.equalsIgnoreCase("s"))
+                    chatMessage.setMe(false);
+                else
+                    chatMessage.setMe(true);
+
                 displayMessage(chatMessage);
                 id++;
 
@@ -117,10 +127,11 @@ public class ChatActivity extends AppCompatActivity {
                             String a = resultSet.getString(0);
                             String ba = resultSet.getString(1);
                             String b = resultSet.getString(2);
-                            String c = resultSet.getString(3) + " " + id;
+                            String c = resultSet.getString(3);
                             String d = resultSet.getString(4);
                             String e = resultSet.getString(5);
                             String f = resultSet.getString(6);
+                            String g = resultSet.getString(7);
                             ChatMessage chatMessage = new ChatMessage();
 
 
@@ -131,7 +142,14 @@ public class ChatActivity extends AppCompatActivity {
                             Date d1 = new Date();
                             d1.setTime((long)(Long.parseLong(d)*1000));
                             chatMessage.setDate((d1.toString()).substring(0,20));
-                            chatMessage.setMe(false);
+
+                            if(g.equalsIgnoreCase("s"))
+                                chatMessage.setMe(false);
+                            else
+                                chatMessage.setMe(true);
+
+
+
                             displayMessage(chatMessage);
                             id++;
 
@@ -169,7 +187,7 @@ public class ChatActivity extends AppCompatActivity {
                 chatMessage.setMessage(messageText);
                 rpdata = messageText;
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-                chatMessage.setMe(true);
+                chatMessage.setMe(false);
                 id++;
                 messageET.setText("");
                 MyTask t = new MyTask();
@@ -247,6 +265,36 @@ class MyTask extends AsyncTask<String,String,String>
 
         @Override
         protected String doInBackground(String... params) {
+
+            try {
+                SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
+
+
+
+                    ContentValues cv = new ContentValues();
+                    cv.put("frommobile", mynumber.trim());
+                    cv.put("tomobile", number);
+                    cv.put("data", rpdata);
+                    Date ddd = new Date();
+
+
+                    cv.put("creationtime", ddd.getTime()/1000);
+                    cv.put("senderttl", rpttl);
+                    cv.put("status", "Pending");
+                    cv.put("action","s");
+                    database.insertOrThrow("MESSAGE", null, cv);
+
+                }
+
+             catch (Exception e) {
+                e.printStackTrace();
+
+
+
+
+            }
+
             RequestPackage rp = new RequestPackage();
             String ans;
             rp.setUri(Utility.serverurl);
