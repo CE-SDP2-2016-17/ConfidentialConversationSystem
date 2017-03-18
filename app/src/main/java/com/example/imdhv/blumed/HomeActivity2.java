@@ -81,7 +81,7 @@ public class HomeActivity2 extends AppCompatActivity {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
                 sp.edit().putInt("userid", 0).apply();
                 sp.edit().putInt("caid", 0).apply();
-                SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
                 database.execSQL("delete from USERS");
                 database.execSQL("delete from MESSAGE");
                 Intent i = new Intent(this, LoginActivity.class);

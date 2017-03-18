@@ -1,13 +1,23 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.imdhv.blumed.Chats">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <EditText
+        android:id="@+id/searchbox1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionSearch"
+
+        android:inputType="textAutoComplete" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lvChats"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="hello_blank_chat_fragment" />
-
-</FrameLayout>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/searchbox1" />
+</RelativeLayout>

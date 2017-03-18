@@ -66,7 +66,7 @@ public class ContactFragment extends Fragment implements AdapterView.OnItemClick
         et = (EditText) v.findViewById(R.id.searchbox);
 
 
-        SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        SQLiteDatabase database = getActivity().openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
         //database.execSQL("delete from USERS");
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());

@@ -1,15 +1,27 @@
 package com.example.imdhv.blumed;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -19,43 +31,31 @@ import android.widget.Toast;
  * to handle interaction events.
  * create an instance of this fragment.
  */
-public class Chats extends Fragment {
+public class Chats extends Fragment implements AdapterView.OnItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     // TODO: Rename and change types of parameters
 
 
+
+
+
+    RecyclerView recyclerView;
+    EditText et;
+    ArrayList<String> arrlistnames = new ArrayList<String>();
+    ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
+    ArrayList<String> commonNames = new ArrayList<String>();
+    ArrayList<String> commonNumbers = new ArrayList<String>();
+    ArrayList<String> commonNames1 = new ArrayList<String>();
+    ArrayList<String> commonNumbers1 = new ArrayList<String>();
+    ChatListAdapter aa;
+
+    List<ChatList> lists = new ArrayList<>();
     public Chats() {
         // Required empty public constructor
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-
-        Cursor resultSet = database.rawQuery("Select * from MESSAGE", null);
-
-        if (resultSet.moveToFirst()) {
-            do {
-                String a = resultSet.getString(0);
-                String ba = resultSet.getString(1);
-                String b = resultSet.getString(2);
-                String c = resultSet.getString(3);
-                String d = resultSet.getString(4);
-                String e = resultSet.getString(5);
-                String f = resultSet.getString(6);
-                Toast.makeText(getActivity(), a + " " + ba + b + c + d + e + f, Toast.LENGTH_LONG).show();
-            }
-            while (resultSet.moveToNext());
-
-
-
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,29 +63,75 @@ public class Chats extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_chats, container, false);
 
-        SQLiteDatabase database = getActivity().openOrCreateDatabase("userlists", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        recyclerView = (RecyclerView) v.findViewById(R.id.lvChats);
+        et = (EditText) v.findViewById(R.id.searchbox1);
 
-        Cursor resultSet = database.rawQuery("Select * from MESSAGE", null);
 
-        if (resultSet.moveToFirst()) {
-            do {
-                String a = resultSet.getString(0);
-                String ba = resultSet.getString(1);
-                String b = resultSet.getString(2);
-                String c = resultSet.getString(3);
-                String d = resultSet.getString(4);
-                String e = resultSet.getString(5);
-                String f = resultSet.getString(6);
-                Toast.makeText(getActivity(), a + " " + ba + b + c + d + e + f, Toast.LENGTH_LONG).show();
+        SQLiteDatabase database = getActivity().openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        //database.execSQL("delete from USERS");
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int caid = sp.getInt("caid", 0);
+        if (caid > 0) {
+            Cursor resultSet = database.rawQuery("Select * from USERS", null);
+            if (resultSet.moveToFirst()) {
+                do {
+                    ChatList obj = new ChatList();
+                    obj.name = resultSet.getString(0);
+                    obj.number = resultSet.getString(1);
+                    lists.add(obj);
+                } while (resultSet.moveToNext());
             }
-            while (resultSet.moveToNext());
 
-
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            aa = new ChatListAdapter(lists,getActivity());
+            recyclerView.setAdapter(aa);
+            // aa = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
+            //lv.setAdapter(aa);
 
         }
+        //else {
+        //    new MyTask().execute();
+        //}
+
+
+        et.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Listview name of the class
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    aa.filter(et.getText().toString());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                // TODO Auto-generated method stub
+
+            }
+        });
+
 
 
         return v;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String name = (String) parent.getItemAtPosition(position);
+        //Integer id1 = (Integer)view.getTag();
+        Toast.makeText(getActivity(), Integer.toString(position), Toast.LENGTH_SHORT).show();
     }
 
 

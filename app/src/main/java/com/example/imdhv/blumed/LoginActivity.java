@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     commonNumbers.add(arrlistphonenumbers.get(arr.getInt(i)));
                 }
                 try{
-                    SQLiteDatabase database = openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+                    SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db",SQLiteDatabase.CREATE_IF_NECESSARY,null);
                     database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT);");
                     int size=commonNames.size();
                     for(int i=0;i<size;i++)

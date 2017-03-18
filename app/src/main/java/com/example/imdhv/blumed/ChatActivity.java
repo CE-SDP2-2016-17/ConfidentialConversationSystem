@@ -46,8 +46,7 @@ public class ChatActivity extends AppCompatActivity {
                 ChatMessage chatMessage = new ChatMessage();
 
 
-                chatMessage.setId(11);
-                chatMessage.setId(122);//dummy
+                chatMessage.setId(1);
                 chatMessage.setMessage(messageText);
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMe(true);

@@ -16,10 +16,10 @@ public class Utility {
 
     public static void createdb(Context c){
         try{
-            SQLiteDatabase database = c.openOrCreateDatabase("userlists",SQLiteDatabase.CREATE_IF_NECESSARY,null);
+            SQLiteDatabase database = c.openOrCreateDatabase("/sdcard/userlists.db",SQLiteDatabase.CREATE_IF_NECESSARY,null);
             database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT);");
             database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime integer,senderttl int,status text);");
-
+            database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT);");
         }
         catch(Exception e1){
             Log.e("",e1+"");
