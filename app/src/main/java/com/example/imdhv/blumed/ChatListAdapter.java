@@ -1,6 +1,7 @@
 package com.example.imdhv.blumed;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -84,8 +85,11 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    Toast.makeText(context,""+mItem.number,Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(context,ChatActivity.class);
+                    i.putExtra("number", mItem.number);
+                    i.putExtra("name", mItem.name);
+                    context.startActivity(i);
+                    //Toast.makeText(context,""+mItem.name,Toast.LENGTH_LONG).show();
                 }
             });
         }

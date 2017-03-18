@@ -1,6 +1,7 @@
 package com.example.imdhv.blumed;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,7 +32,7 @@ import java.util.List;
  * to handle interaction events.
  * create an instance of this fragment.
  */
-public class Chats extends Fragment implements AdapterView.OnItemClickListener {
+public class ChatListFragment extends Fragment implements AdapterView.OnItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -43,17 +44,17 @@ public class Chats extends Fragment implements AdapterView.OnItemClickListener {
 
     RecyclerView recyclerView;
     EditText et;
-    ArrayList<String> arrlistnames = new ArrayList<String>();
-    ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
-    ArrayList<String> commonNames = new ArrayList<String>();
-    ArrayList<String> commonNumbers = new ArrayList<String>();
-    ArrayList<String> commonNames1 = new ArrayList<String>();
-    ArrayList<String> commonNumbers1 = new ArrayList<String>();
+    //ArrayList<String> arrlistnames = new ArrayList<String>();
+    //ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
+    //ArrayList<String> commonNames = new ArrayList<String>();
+    //ArrayList<String> commonNumbers = new ArrayList<String>();
+    //ArrayList<String> commonNames1 = new ArrayList<String>();
+    //ArrayList<String> commonNumbers1 = new ArrayList<String>();
     ChatListAdapter aa;
 
     List<ChatList> lists = new ArrayList<>();
-    public Chats() {
-        // Required empty public constructor
+    public ChatListFragment() {
+
     }
 
 
@@ -68,12 +69,12 @@ public class Chats extends Fragment implements AdapterView.OnItemClickListener {
 
 
         SQLiteDatabase database = getActivity().openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-        //database.execSQL("delete from USERS");
+
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int caid = sp.getInt("caid", 0);
         if (caid > 0) {
-            Cursor resultSet = database.rawQuery("Select * from USERS", null);
+            Cursor resultSet = database.rawQuery("Select * from CHATLIST", null);
             if (resultSet.moveToFirst()) {
                 do {
                     ChatList obj = new ChatList();
@@ -86,13 +87,10 @@ public class Chats extends Fragment implements AdapterView.OnItemClickListener {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             aa = new ChatListAdapter(lists,getActivity());
             recyclerView.setAdapter(aa);
-            // aa = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, commonNames1);
-            //lv.setAdapter(aa);
+
 
         }
-        //else {
-        //    new MyTask().execute();
-        //}
+
 
 
         et.addTextChangedListener(new TextWatcher() {
@@ -129,9 +127,15 @@ public class Chats extends Fragment implements AdapterView.OnItemClickListener {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String name = (String) parent.getItemAtPosition(position);
-        //Integer id1 = (Integer)view.getTag();
-        Toast.makeText(getActivity(), Integer.toString(position), Toast.LENGTH_SHORT).show();
+
+        String number = (String) parent.getItemAtPosition(position);
+
+        Intent i = new Intent(getActivity(), ChatActivity.class);
+        i.putExtra("number", number);
+        startActivity(i);
+        //getActivity().finish();
+        //Toast.makeText(getActivity(), Integer.toString(position), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), number, Toast.LENGTH_SHORT).show();
     }
 
 

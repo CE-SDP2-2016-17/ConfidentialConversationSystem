@@ -1,5 +1,15 @@
 package com.example.imdhv.blumed;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -8,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.text.DateFormat;
@@ -21,9 +32,58 @@ public class ChatActivity extends AppCompatActivity {
     private Button sendBtn;
     private ChatAdapter adapter;
     private ArrayList<ChatMessage> chatHistory;
+    private TextView chatName;
+    BroadcastReceiver receiver;
+    int id=1;
+    String rpdata,rptype,rpttl;
+
+    SharedPreferences sp;
+    String number,name,mynumber;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,new IntentFilter(MyFirebaseMessagingService.COPA_RESULT));
+    }
+
+    void doit()
+    {
+        adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
+        messagesContainer.setAdapter(adapter);
+        SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+
+        Cursor resultSet = database.rawQuery("Select * from MESSAGE WHERE status = 'Pending' and frommobile ='" + number + "'", null);
+        id=1;
+        if (resultSet.moveToFirst()) {
+            do {
+                String a = resultSet.getString(0);
+                String ba = resultSet.getString(1);
+                String b = resultSet.getString(2);
+                String c = resultSet.getString(3) + " " + id;
+                String d = resultSet.getString(4);
+                String e = resultSet.getString(5);
+                String f = resultSet.getString(6);
+                ChatMessage chatMessage = new ChatMessage();
+
+
+                chatMessage.setId(id);
+                chatMessage.setMessage(c);
+                //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+
+                Date d1 = new Date();
+                d1.setTime((long)(Long.parseLong(d)*1000));
+                chatMessage.setDate((d1.toString()).substring(0,20));
+                chatMessage.setMe(false);
+                displayMessage(chatMessage);
+                id++;
+
+            }
+            while (resultSet.moveToNext());
 
 
 
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +92,66 @@ public class ChatActivity extends AppCompatActivity {
 
         findAllViews();
 
-        loadDummyHistory();
+        number = getIntent().getStringExtra("number");
+        name = getIntent().getStringExtra("name");
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        mynumber = sp.getString("mynumber","");
+        rpttl = sp.getString("pref_sender_ttl","");
+
+        doit();
+        Toast.makeText(this,rpttl,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,mynumber,Toast.LENGTH_SHORT).show();
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (this != null) {
+                    adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
+                    messagesContainer.setAdapter(adapter);
+                    SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+
+                    Cursor resultSet = database.rawQuery("Select * from MESSAGE WHERE status = 'Pending' and frommobile ='" + number + "'", null);
+                    id=1;
+                    if (resultSet.moveToFirst()) {
+                        do {
+                            String a = resultSet.getString(0);
+                            String ba = resultSet.getString(1);
+                            String b = resultSet.getString(2);
+                            String c = resultSet.getString(3) + " " + id;
+                            String d = resultSet.getString(4);
+                            String e = resultSet.getString(5);
+                            String f = resultSet.getString(6);
+                            ChatMessage chatMessage = new ChatMessage();
+
+
+                            chatMessage.setId(id);
+                            chatMessage.setMessage(c);
+                            //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+
+                            Date d1 = new Date();
+                            d1.setTime((long)(Long.parseLong(d)*1000));
+                            chatMessage.setDate((d1.toString()).substring(0,20));
+                            chatMessage.setMe(false);
+                            displayMessage(chatMessage);
+                            id++;
+
+                        }
+                        while (resultSet.moveToNext());
+
+
+
+                    }
+
+                }
+            }
+        };
+
+
+
+
+        chatName.setText(name);
+
+       // loadDummyHistory();
 
         sendBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -46,13 +165,15 @@ public class ChatActivity extends AppCompatActivity {
                 ChatMessage chatMessage = new ChatMessage();
 
 
-                chatMessage.setId(1);
+                chatMessage.setId(id);
                 chatMessage.setMessage(messageText);
+                rpdata = messageText;
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMe(true);
-
+                id++;
                 messageET.setText("");
-
+                MyTask t = new MyTask();
+                t.execute();
                 displayMessage(chatMessage);
             }
         });
@@ -63,6 +184,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesContainer = (ListView) findViewById(R.id.messagesContainer);
         messageET = (EditText) findViewById(R.id.messageEdit);
         sendBtn = (Button) findViewById(R.id.chatSendButton);
+        chatName = (TextView) findViewById(R.id.chatName);
     }
 
     public void displayMessage(ChatMessage message) {
@@ -75,7 +197,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 
-    private void loadDummyHistory(){
+    /*private void loadDummyHistory(){
 
         chatHistory = new ArrayList<ChatMessage>();
 
@@ -98,6 +220,45 @@ public class ChatActivity extends AppCompatActivity {
         for(int i=0; i<chatHistory.size(); i++) {
             ChatMessage message = chatHistory.get(i);
             displayMessage(message);
+        }
+    }*/
+class MyTask extends AsyncTask<String,String,String>
+    {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            int value = Integer.parseInt(s.trim());
+            if (value > 0) {
+
+                Toast.makeText(ChatActivity.this,"Done yeah",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            else
+            {
+                Toast.makeText(ChatActivity.this,"Not Done..",Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            RequestPackage rp = new RequestPackage();
+            String ans;
+            rp.setUri(Utility.serverurl);
+            rp.setParam("type", "sendmessage");
+            rp.setParam("data", rpdata);
+            rp.setParam("frommobile",mynumber.trim());
+            rp.setParam("tomobile",number);
+            rp.setParam("senderttl",rpttl);
+            rp.setMethod("POST");
+            ans=HttpManager.getData(rp);
+
+            return ans;
         }
     }
 }

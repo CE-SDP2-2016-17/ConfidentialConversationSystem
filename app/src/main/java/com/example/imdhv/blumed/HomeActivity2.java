@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -16,14 +13,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import android.view.WindowManager;
-import android.widget.TextView;
 
 public class HomeActivity2 extends AppCompatActivity {
 
@@ -118,7 +111,7 @@ public class HomeActivity2 extends AppCompatActivity {
         public Fragment getItem(int position) {
 
             if(position==0){
-                return new Chats();
+                return new ChatListFragment();
             }
             else if(position==1){
                 return new ContactFragment();
@@ -136,7 +129,7 @@ public class HomeActivity2 extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Chats";
+                    return "ChatListFragment";
                 case 1:
                     return "Contacts";
             }

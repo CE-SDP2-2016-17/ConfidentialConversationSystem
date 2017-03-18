@@ -3,10 +3,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:id="@+id/chatName"
-        android:text="afcsd"/>
+        android:textSize="30sp"
+        android:foreground="@color/primary_text"
+        android:background="@color/primary_light"
+        android:textAlignment="center"/>
 
     <RelativeLayout
         android:id="@+id/container"

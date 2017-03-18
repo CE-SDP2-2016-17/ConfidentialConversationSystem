@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText etUsername,etPassword;
+    String mynumber;
     Button btnLogin;
     TextView tvRegister;
     ArrayList<String> arrlistnames = new ArrayList<String>();
@@ -154,12 +155,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
             sp.edit().putInt("caid",2 ).apply();
+            sp.edit().putString("mynumber",mynumber).apply();
+
+            //SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+            //Cursor resultSet = database.rawQuery("Select * from USERS WHERE status = 'Pending' and frommobile ='" + number + "'", null);
 
         }
 
         @Override
         protected String doInBackground(String... params) {
             RequestPackage rp = new RequestPackage();
+
+            rp.setUri(Utility.serverurl);
+            rp.setParam("type", "mynumber");
+            rp.setParam("un", un);
+            rp.setMethod("GET");
+            mynumber=HttpManager.getData(rp);
+
+
+
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "login");
             rp.setParam("un", un);

@@ -13,5 +13,6 @@ public class UserDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_detail);
         id = getIntent().getStringExtra("extraid");
 
+
     }
 }
