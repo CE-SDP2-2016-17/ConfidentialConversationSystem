@@ -56,8 +56,8 @@ public class ChatActivity extends AppCompatActivity {
         adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
         SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-
-        Cursor resultSet = database.rawQuery("Select * from MESSAGE WHERE status = 'Pending' and frommobile ='" + number + "'", null);
+        String p ="Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number + "')" + " or (status = 'Pending' and tomobile ='" + number + "')" ;
+        Cursor resultSet = database.rawQuery(p, null);
         id=1;
         if (resultSet.moveToFirst()) {
             do {
@@ -109,8 +109,8 @@ public class ChatActivity extends AppCompatActivity {
         rpttl = sp.getString("pref_sender_ttl","");
 
         doit();
-        Toast.makeText(this,rpttl,Toast.LENGTH_SHORT).show();
-        Toast.makeText(this,mynumber,Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this,rpttl,Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this,mynumber,Toast.LENGTH_SHORT).show();
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -119,8 +119,8 @@ public class ChatActivity extends AppCompatActivity {
                     adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
                     messagesContainer.setAdapter(adapter);
                     SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-
-                    Cursor resultSet = database.rawQuery("Select * from MESSAGE WHERE status = 'Pending' and frommobile ='" + number + "'", null);
+                    String p ="Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number + "')" + " or (status = 'Pending' and tomobile ='" + number + "')" ;
+                    Cursor resultSet = database.rawQuery(p, null);
                     id=1;
                     if (resultSet.moveToFirst()) {
                         do {
@@ -254,12 +254,12 @@ class MyTask extends AsyncTask<String,String,String>
             int value = Integer.parseInt(s.trim());
             if (value > 0) {
 
-                Toast.makeText(ChatActivity.this,"Done yeah",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ChatActivity.this,"Done yeah",Toast.LENGTH_SHORT).show();
                 return;
             }
             else
             {
-                Toast.makeText(ChatActivity.this,"Not Done..",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ChatActivity.this,"Not Done..",Toast.LENGTH_SHORT).show();
             }
         }
 

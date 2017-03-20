@@ -1,6 +1,9 @@
 package com.example.imdhv.blumed;
 
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -85,7 +88,15 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
                 @Override
                 public void onClick(View v) {
 
-                    Toast.makeText(context,""+mItem.number,Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context,""+mItem.number,Toast.LENGTH_LONG).show();
+                    //SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    //Cursor resultSet = database.rawQuery("Select * from CHATLIST WHERE Number = '" + mItem.number + "'", null);
+                   // if (resultSet.moveToFirst())
+                    //{
+                        Intent i = new Intent(context,ChatActivity.class);
+                        i.putExtra("number", mItem.number);
+                        context.startActivity(i);
+                    //}
                 }
             });
         }
