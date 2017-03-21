@@ -32,8 +32,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button btnLogin;
     TextView tvRegister;
     ArrayList<String> arrlistnames = new ArrayList<String>();
+
     ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
     ArrayList<String> commonNames=new ArrayList<String>();
+
     ArrayList<String> commonNumbers=new ArrayList<String>();
     ArrayList<String> commonNames1=new ArrayList<String>();
     ArrayList<String> commonNumbers1=new ArrayList<String>();
