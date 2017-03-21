@@ -86,6 +86,9 @@ public class HomeActivity2 extends AppCompatActivity {
                      startActivity(i2);
 
                 break;
+            case R.id.menuitem_change_passcode:
+                Intent i3 = new Intent(this,ChangePasscode.class);
+                startActivity(i3);
             default:
                 break;
 
