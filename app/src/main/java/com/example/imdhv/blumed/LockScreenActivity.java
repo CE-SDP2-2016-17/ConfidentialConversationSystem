@@ -43,6 +43,7 @@ public class LockScreenActivity extends AppCompatActivity implements View.OnClic
         if(Integer.parseInt(passCode.getText().toString())==pass){
             Intent i=new Intent(LockScreenActivity.this,LoginActivity.class);
             startActivity(i);
+            //finish(i);
         }
         else
         {
