@@ -1,25 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:capitalize="words"
-        android:defaultValue=""
-        android:inputType="textCapWords"
-        android:key="pref_display_name"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Display Name" />
 
-    <RingtonePreference
-        android:defaultValue="content://settings/system/notification_sound"
-
-        android:key="notifications_new_message_ringtone"
-        android:ringtoneType="notification"
-        android:title="@string/pref_title_ringtone" />
 
     <EditTextPreference
         android:capitalize="words"
-        android:defaultValue=""
+        android:defaultValue="0"
         android:inputType="number"
         android:key="pref_sender_ttl"
         android:hint="Value in Seconds"
@@ -31,7 +16,7 @@
 
     <EditTextPreference
         android:capitalize="words"
-        android:defaultValue=""
+        android:defaultValue="0"
         android:inputType="number"
         android:key="pref_receiver_ttl"
         android:maxLines="1"

@@ -1,5 +1,6 @@
 package com.example.imdhv.blumed;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -35,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,7 +75,7 @@ public class ChatActivity extends AppCompatActivity {
                 String a = resultSet.getString(0);
                 String ba = resultSet.getString(1);
                 String b = resultSet.getString(2);
-                String c = resultSet.getString(3);
+                byte[] c = resultSet.getBlob(3);
                 String d = resultSet.getString(4);
                 String e = resultSet.getString(5);
                 String f = resultSet.getString(6);
@@ -82,8 +84,16 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 chatMessage.setId(id);
-                chatMessage.setMessage(c);
+                String text="";
+                try {
+                    text = Utility.decryptClient(c);
+                    Toast.makeText(ChatActivity.this,text,Toast.LENGTH_LONG);
+                }catch (GeneralSecurityException x)
+                {
+                    Toast.makeText(ChatActivity.this,x.toString(),Toast.LENGTH_LONG);
+                }
                 //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+                chatMessage.setMessage(text);
 
                 Date d1 = new Date();
                 d1.setTime((long)(Long.parseLong(d)*1000));
@@ -116,6 +126,7 @@ public class ChatActivity extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         mynumber = sp.getString("mynumber","");
         rpttl = sp.getString("pref_sender_ttl","");
+        rpttl="50";
 
         doit();
        // Toast.makeText(this,rpttl,Toast.LENGTH_SHORT).show();
@@ -136,7 +147,7 @@ public class ChatActivity extends AppCompatActivity {
                             String a = resultSet.getString(0);
                             String ba = resultSet.getString(1);
                             String b = resultSet.getString(2);
-                            String c = resultSet.getString(3);
+                            byte[] c = resultSet.getBlob(3);
                             String d = resultSet.getString(4);
                             String e = resultSet.getString(5);
                             String f = resultSet.getString(6);
@@ -145,9 +156,16 @@ public class ChatActivity extends AppCompatActivity {
 
 
                             chatMessage.setId(id);
-                            chatMessage.setMessage(c);
+                            String text="";
+                            try {
+                                text = Utility.decryptClient(c);
+                                Toast.makeText(ChatActivity.this,""+text,Toast.LENGTH_LONG);
+                            }catch (GeneralSecurityException x)
+                            {
+                                Toast.makeText(ChatActivity.this,x.toString(),Toast.LENGTH_LONG);
+                            }
                             //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-
+                            chatMessage.setMessage(text);
                             Date d1 = new Date();
                             d1.setTime((long)(Long.parseLong(d)*1000));
                             chatMessage.setDate((d1.toString()).substring(0,20));
@@ -187,20 +205,21 @@ public class ChatActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(messageText)) {
                     return;
                 }
-                //Uri s= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                //NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ChatActivity.this);
-                //mBuilder.setSmallIcon(R.mipmap.ic_launcher);
-                //mBuilder.setContentTitle("Blumed");
-                //mBuilder.setContentText("New Message");
-                //mBuilder.setAutoCancel(true);
-                //mBuilder.setSound(s);
+                /*Uri s= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ChatActivity.this);
+                mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+                mBuilder.setContentTitle("Blumed");
+                mBuilder.setContentText("New Message");
+                mBuilder.setAutoCancel(true);
+                mBuilder.setSound(s);
+                mBuilder.setPriority(Notification.PRIORITY_HIGH);
 
-                //Intent intent = new Intent(ChatActivity.this, LockScreenActivity.class);
-                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //PendingIntent pendingIntent = PendingIntent.getActivity(ChatActivity.this,0,intent,PendingIntent.FLAG_ONE_SHOT);
-                //mBuilder.setContentIntent(pendingIntent);
-                //NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                //mNotificationManager.notify(0, mBuilder.build());
+                Intent intent = new Intent(ChatActivity.this, LockScreenActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(ChatActivity.this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+                mBuilder.setContentIntent(pendingIntent);
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(0, mBuilder.build());*/
                 ConnectivityManager connectivityManager
                         = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
@@ -305,7 +324,8 @@ class MyTask extends AsyncTask<String,String,String>
                     ContentValues cv = new ContentValues();
                     cv.put("frommobile", mynumber.trim());
                     cv.put("tomobile", number);
-                    cv.put("data", rpdata);
+                    byte[] enc=Utility.encryptClient(rpdata);
+                    cv.put("data", enc);
                     Date ddd = new Date();
 
 

@@ -1,6 +1,13 @@
 package com.example.imdhv.blumed;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.widget.Toast;
+
+import java.security.GeneralSecurityException;
+
+import static java.security.AccessController.getContext;
 
 public class ChatMessage {
 

@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class HomeActivity2 extends AppCompatActivity {
 
@@ -57,6 +58,15 @@ public class HomeActivity2 extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
     }
+    @Override
+    protected void onRestart() {
+
+        // TODO Auto-generated method stub
+        super.onRestart();
+        finish();
+        Intent i= new Intent(this,HomeActivity2.class);
+        startActivity(i);
+    }
 
 
     @Override
@@ -89,6 +99,17 @@ public class HomeActivity2 extends AppCompatActivity {
             case R.id.menuitem_change_passcode:
                 Intent i3 = new Intent(this,ChangePasscode.class);
                 startActivity(i3);
+                break;
+
+            case R.id.menuitem_clear_chats:
+                SQLiteDatabase database1 = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                database1.execSQL("delete from CHATLIST");
+                database1.execSQL("delete from MESSAGE");
+                Toast.makeText(HomeActivity2.this,"All Chats are cleared",Toast.LENGTH_LONG).show();
+                Intent i1 = new Intent(this, HomeActivity2.class);
+                finish();
+                startActivity(i1);
+
             default:
                 break;
 

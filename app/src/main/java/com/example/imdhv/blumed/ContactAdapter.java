@@ -1,5 +1,7 @@
 package com.example.imdhv.blumed;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -89,14 +91,40 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
                 public void onClick(View v) {
 
                     //Toast.makeText(context,""+mItem.number,Toast.LENGTH_LONG).show();
-                    //SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                    //Cursor resultSet = database.rawQuery("Select * from CHATLIST WHERE Number = '" + mItem.number + "'", null);
-                   // if (resultSet.moveToFirst())
-                    //{
+                    SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    Cursor resultSet = database.rawQuery("Select * from CHATLIST WHERE Number = '" + mItem.number + "'", null);
+                    if(resultSet.moveToFirst()) {
+                        Intent i = new Intent(context, ChatActivity.class);
+                        i.putExtra("number", mItem.number);
+                        i.putExtra("name", mItem.name);
+                        context.startActivity(i);
+                        //((Activity)context).finish();
+                    }
+                    else
+                    {
+                        database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT);");
+                        ContentValues cv = new ContentValues();
+                        cv.put("Name", mItem.name);
+                        cv.put("Number",mItem.number);
+                        database.insertOrThrow("CHATLIST", null, cv);
                         Intent i = new Intent(context,ChatActivity.class);
                         i.putExtra("number", mItem.number);
+                        i.putExtra("name", mItem.name);
                         context.startActivity(i);
-                    //}
+                        //((Activity)context).finish();
+
+                    }
+
+
+                        //database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT);");
+                        //ContentValues cv = new ContentValues();
+                        //cv.put("Name", mItem.name);
+                        //cv.put("Number",mItem.number);
+                        //database.insertOrThrow("CHATLIST", null, cv);
+                        //Intent i = new Intent(context,ChatActivity.class);
+                        //i.putExtra("number", mItem.number);
+                        //context.startActivity(i);
+
                 }
             });
         }

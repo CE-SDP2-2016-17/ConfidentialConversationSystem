@@ -1,5 +1,6 @@
 package com.example.imdhv.blumed;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -7,12 +8,14 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -24,11 +27,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.GeneralSecurityException;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     String frommobile,tomobile,data,status;
     int senderttl;
     long creationtime;
-
     final static public String COPA_RESULT = "com.example.imdhv.blumed.MyFirebaseMessagingService.REQUEST_PROCESSED";
 
     @Override
@@ -47,6 +55,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         mBuilder.setAutoCancel(true);
         mBuilder.setSound(notificationSound);
         mBuilder.setContentIntent(pendingIntent);
+        mBuilder.setPriority(Notification.PRIORITY_HIGH);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(0, mBuilder.build());
 
@@ -64,6 +73,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 frommobile = obj.get("frommobile").toString();
                 tomobile = obj.get("tomobile").toString();
                 data = obj.get("data").toString();
+                byte[] enc=Utility.encryptClient(data);
                 String a = obj.get("creationtime").toString();
                 creationtime = Long.parseLong(a);
                 String b = obj.get("senderttl").toString();
@@ -82,7 +92,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     ContentValues cv = new ContentValues();
                     cv.put("frommobile", frommobile);
                     cv.put("tomobile", tomobile);
-                    cv.put("data", data);
+                    cv.put("data", enc);
                     cv.put("creationtime", creationtime);
                     cv.put("senderttl", senderttl);
                     cv.put("status", status);
@@ -96,7 +106,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
 
 
