@@ -38,7 +38,7 @@ public class HomeActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_home2);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -132,7 +132,7 @@ public class HomeActivity2 extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "ChatListFragment";
+                    return "Chats";
                 case 1:
                     return "Contacts";
             }

@@ -1,13 +1,20 @@
 package com.example.imdhv.blumed;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -28,6 +35,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
 
+        Intent intent = new Intent(this,LockScreenActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+        Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        mBuilder.setContentTitle("Blumed");
+        mBuilder.setContentText("New Message");
+        mBuilder.setAutoCancel(true);
+        mBuilder.setSound(notificationSound);
+        mBuilder.setContentIntent(pendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mBuilder.build());
 
 
         Log.e("FCM MSG", "From: " + remoteMessage.getData());
@@ -85,7 +106,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
 
-        Intent intent = new Intent(COPA_RESULT);
+        intent = new Intent(COPA_RESULT);
         broadcaster.sendBroadcast(intent);
 
 

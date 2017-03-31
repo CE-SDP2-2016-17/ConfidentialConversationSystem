@@ -3,10 +3,13 @@ package com.example.imdhv.blumed;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -76,9 +79,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         // now connect with php and pass un, pw to server, server will decide whether correct or not
-        MyTask t = new MyTask();
-        t.execute();
+        if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
+        {
+            MyTask t = new MyTask();
+            t.execute();
+        }
+        else
+        {
+            Toast.makeText(LoginActivity.this,"No Internet Connection",Toast.LENGTH_LONG).show();
+        }
     }
 
     class MyTask extends AsyncTask<String, String, String>{

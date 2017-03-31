@@ -53,6 +53,7 @@ public class ChangePasscode extends AppCompatActivity implements View.OnClickLis
                         Toast.makeText(this,"passcode changed",Toast.LENGTH_LONG).show();
                     Intent i = new Intent(this,HomeActivity2.class);
                     startActivity(i);
+                    finish();
                 }
             }
             else{

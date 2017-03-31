@@ -40,9 +40,15 @@ public class LockScreenActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
+        if(passCode.getText().toString().isEmpty())
+        {
+            Toast.makeText(this,"Enter Passcode",Toast.LENGTH_LONG).show();
+        }
+        else
         if(Integer.parseInt(passCode.getText().toString())==pass){
             Intent i=new Intent(LockScreenActivity.this,LoginActivity.class);
             startActivity(i);
+            finish();
         }
         else
         {

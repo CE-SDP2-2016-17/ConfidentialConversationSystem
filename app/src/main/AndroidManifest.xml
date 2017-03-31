@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -17,37 +18,38 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".LockScreenActivity">
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait"
+            android:excludeFromRecents="true"></activity>
+        <activity android:name=".LockScreenActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".UserListActivity" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".HomeActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".UserListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".RegisterActivity" android:screenOrientation="portrait"/>
         <activity
-            android:name=".LoginReadyActivity"
+            android:name=".LoginReadyActivity" android:screenOrientation="portrait"
             android:label="@string/title_activity_login_ready" />
-        <activity android:name=".UserDetailActivity" />
-        <activity android:name=".DisplayContactActivity" />
-        <activity
+        <activity android:name=".UserDetailActivity"  android:screenOrientation="portrait"/>
+        <activity android:name=".DisplayContactActivity" android:screenOrientation="portrait"/>
+        <activity android:screenOrientation="portrait"
             android:name=".HomeActivity2"
             android:label="Blumed"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".SettingsActivity" android:screenOrientation="portrait"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".HomeActivity2">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.imdhv.blumed.HomeActivity2" />
         </activity>
-        <activity android:name=".CustomSettings" />
+        <activity android:name=".CustomSettings"  android:screenOrientation="portrait"/>
         <activity
-            android:name=".NewMessageActivity"
+            android:name=".NewMessageActivity" android:screenOrientation="portrait"
             android:label="@string/title_activity_new_message"
             android:theme="@style/AppTheme.NoActionBar" />
 

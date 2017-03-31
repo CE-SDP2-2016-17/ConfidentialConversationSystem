@@ -12,7 +12,7 @@ import android.widget.Toast;
  */
 
 public class Utility {
-    public static final String serverurl = "http://192.168.43.63/project1/androidsupport.php";
+    public static final String serverurl = "https://blumed.000webhostapp.com/androidsupport.php";
 
     public static void createdb(Context c){
         try{

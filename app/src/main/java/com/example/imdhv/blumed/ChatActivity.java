@@ -1,5 +1,7 @@
 package com.example.imdhv.blumed;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,13 +10,20 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -99,7 +108,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         findAllViews();
 
         number = getIntent().getStringExtra("number");
@@ -178,21 +187,42 @@ public class ChatActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(messageText)) {
                     return;
                 }
+                //Uri s= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                //NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ChatActivity.this);
+                //mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+                //mBuilder.setContentTitle("Blumed");
+                //mBuilder.setContentText("New Message");
+                //mBuilder.setAutoCancel(true);
+                //mBuilder.setSound(s);
 
-
-                ChatMessage chatMessage = new ChatMessage();
-
-
-                chatMessage.setId(id);
-                chatMessage.setMessage(messageText);
-                rpdata = messageText;
-                chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-                chatMessage.setMe(false);
-                id++;
-                messageET.setText("");
-                MyTask t = new MyTask();
-                t.execute();
-                displayMessage(chatMessage);
+                //Intent intent = new Intent(ChatActivity.this, LockScreenActivity.class);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //PendingIntent pendingIntent = PendingIntent.getActivity(ChatActivity.this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+                //mBuilder.setContentIntent(pendingIntent);
+                //NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                //mNotificationManager.notify(0, mBuilder.build());
+                ConnectivityManager connectivityManager
+                        = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                // now connect with php and pass un, pw to server, server will decide whether correct or not
+                if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
+                {
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.setId(id);
+                    chatMessage.setMessage(messageText);
+                    rpdata = messageText;
+                    chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+                    chatMessage.setMe(false);
+                    id++;
+                    messageET.setText("");
+                    MyTask t = new MyTask();
+                    t.execute();
+                    displayMessage(chatMessage);
+                }
+                else
+                {
+                    Toast.makeText(ChatActivity.this,"No Internet Connection",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
