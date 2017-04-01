@@ -52,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
     int id=1;
     String rpdata,rptype,rpttl="5";
+    ChatMessage chatMessage;
 
     SharedPreferences sp;
     String number,name,mynumber;
@@ -87,10 +88,10 @@ public class ChatActivity extends AppCompatActivity {
                 String text="";
                 try {
                     text = Utility.decryptClient(c);
-                    Toast.makeText(ChatActivity.this,text,Toast.LENGTH_LONG);
+                    //Toast.makeText(ChatActivity.this,text,Toast.LENGTH_LONG).show();
                 }catch (GeneralSecurityException x)
                 {
-                    Toast.makeText(ChatActivity.this,x.toString(),Toast.LENGTH_LONG);
+                    //Toast.makeText(ChatActivity.this,x.toString(),Toast.LENGTH_LONG).show();
                 }
                 //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMessage(text);
@@ -226,7 +227,7 @@ public class ChatActivity extends AppCompatActivity {
                 // now connect with php and pass un, pw to server, server will decide whether correct or not
                 if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
                 {
-                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage = new ChatMessage();
                     chatMessage.setId(id);
                     chatMessage.setMessage(messageText);
                     rpdata = messageText;
@@ -236,7 +237,6 @@ public class ChatActivity extends AppCompatActivity {
                     messageET.setText("");
                     MyTask t = new MyTask();
                     t.execute();
-                    displayMessage(chatMessage);
                 }
                 else
                 {
@@ -299,64 +299,67 @@ class MyTask extends AsyncTask<String,String,String>
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            //Toast.makeText(ChatActivity.this,s,Toast.LENGTH_SHORT).show();
 
-            int value = Integer.parseInt(s.trim());
-            if (value > 0) {
-
+            if (s!="0") {
+                displayMessage(chatMessage);
                 //Toast.makeText(ChatActivity.this,"Done yeah",Toast.LENGTH_SHORT).show();
                 return;
             }
             else
             {
-                //Toast.makeText(ChatActivity.this,"Not Done..",Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatActivity.this,"Other User is not logged in",Toast.LENGTH_SHORT).show();
             }
         }
 
         @Override
         protected String doInBackground(String... params) {
+            RequestPackage rp = new RequestPackage();
+            String ans;
+            rp.setUri(Utility.serverurl);
+            rp.setParam("type","fcmcheck");
+            rp.setParam("number",number);
+            rp.setMethod("POST");
+            ans = HttpManager.getData(rp);
+            if (!ans.isEmpty()) {
+                rp.setUri(Utility.serverurl);
+                rp.setParam("type", "sendmessage");
+                rp.setParam("data", rpdata);
+                rp.setParam("frommobile", mynumber.trim());
+                rp.setParam("tomobile", number);
+                rp.setParam("senderttl", rpttl);
+                rp.setMethod("POST");
+                ans = HttpManager.getData(rp);
 
-            try {
-                SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
-
+                try {
+                    SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
 
 
                     ContentValues cv = new ContentValues();
                     cv.put("frommobile", mynumber.trim());
                     cv.put("tomobile", number);
-                    byte[] enc=Utility.encryptClient(rpdata);
+                    byte[] enc = Utility.encryptClient(rpdata);
                     cv.put("data", enc);
                     Date ddd = new Date();
 
 
-                    cv.put("creationtime", ddd.getTime()/1000);
+                    cv.put("creationtime", ddd.getTime() / 1000);
                     cv.put("senderttl", rpttl);
                     cv.put("status", "Pending");
-                    cv.put("action","s");
+                    cv.put("action", "s");
                     database.insertOrThrow("MESSAGE", null, cv);
 
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-             catch (Exception e) {
-                e.printStackTrace();
-
-
-
-
+                return ans;
             }
-
-            RequestPackage rp = new RequestPackage();
-            String ans;
-            rp.setUri(Utility.serverurl);
-            rp.setParam("type", "sendmessage");
-            rp.setParam("data", rpdata);
-            rp.setParam("frommobile",mynumber.trim());
-            rp.setParam("tomobile",number);
-            rp.setParam("senderttl",rpttl);
-            rp.setMethod("POST");
-            ans=HttpManager.getData(rp);
-
-            return ans;
+            else
+            {
+                return "0";
+            }
         }
     }
 }
+

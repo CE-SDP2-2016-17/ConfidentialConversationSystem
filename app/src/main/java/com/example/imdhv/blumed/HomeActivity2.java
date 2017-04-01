@@ -1,8 +1,11 @@
 package com.example.imdhv.blumed;
 
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +21,8 @@ import android.view.MenuItem;
 
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import java.util.Date;
 
 public class HomeActivity2 extends AppCompatActivity {
 
@@ -76,6 +81,41 @@ public class HomeActivity2 extends AppCompatActivity {
         return true;
     }
 
+    class MyTask extends AsyncTask<String,String,String> {
+        ProgressDialog pd;
+        String un, pw;
+        int value;
+        @Override
+        protected void onPreExecute() {
+                super.onPreExecute();
+                pd= new ProgressDialog(HomeActivity2.this);
+                pd.setIndeterminate(true);
+                pd.setCancelable(false);
+                pd.setTitle("Loading...");
+                pd.setMessage("Please Wait...");
+                pd.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(HomeActivity2.this,"Logout Successful",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
+            String un=sp.getString("username","");
+            RequestPackage rp = new RequestPackage();
+            String ans;
+            rp.setUri(Utility.serverurl);
+            rp.setParam("type", "logout");
+            rp.setParam("un",un);
+            rp.setMethod("POST");
+            ans = HttpManager.getData(rp);
+            return ans;
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -87,6 +127,8 @@ public class HomeActivity2 extends AppCompatActivity {
                 SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
                 database.execSQL("delete from USERS");
                 database.execSQL("delete from MESSAGE");
+                MyTask t=new MyTask();
+                t.execute();
                 Intent i = new Intent(this, LoginActivity.class);
                 startActivity(i);
                 finish();

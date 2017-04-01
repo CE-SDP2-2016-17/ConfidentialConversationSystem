@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -37,90 +39,92 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     String frommobile,tomobile,data,status;
     int senderttl;
     long creationtime;
+    private Handler h=new Handler();
+    LocalBroadcastManager broadcaster;
+
     final static public String COPA_RESULT = "com.example.imdhv.blumed.MyFirebaseMessagingService.REQUEST_PROCESSED";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
+        SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(this);
+        int caid=sp.getInt("caid",0);
 
-        Intent intent = new Intent(this,LockScreenActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
-        Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            broadcaster = LocalBroadcastManager.getInstance(this);
+            Intent intent = new Intent(this, LockScreenActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+            Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
-        mBuilder.setContentTitle("Blumed");
-        mBuilder.setContentText("New Message");
-        mBuilder.setAutoCancel(true);
-        mBuilder.setSound(notificationSound);
-        mBuilder.setContentIntent(pendingIntent);
-        mBuilder.setPriority(Notification.PRIORITY_HIGH);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(0, mBuilder.build());
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+            mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+            mBuilder.setContentTitle("Blumed");
+            mBuilder.setContentText("New Message");
+            mBuilder.setAutoCancel(true);
+            mBuilder.setSound(notificationSound);
+            mBuilder.setContentIntent(pendingIntent);
+            mBuilder.setPriority(Notification.PRIORITY_HIGH);
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(0, mBuilder.build());
 
 
-        Log.e("FCM MSG", "From: " + remoteMessage.getData());
+            Log.e("FCM MSG", "From: " + remoteMessage.getData());
 
-        String msgobj = remoteMessage.getData().get("newmessage");
+            String msgobj = remoteMessage.getData().get("newmessage");
 
-        try {
-            JSONArray arr = new JSONArray(msgobj);
-            SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-            database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
-            for (int i = 0; i < arr.length(); i++) {
-                JSONObject obj = arr.getJSONObject(i);
-                frommobile = obj.get("frommobile").toString();
-                tomobile = obj.get("tomobile").toString();
-                data = obj.get("data").toString();
-                byte[] enc=Utility.encryptClient(data);
-                String a = obj.get("creationtime").toString();
-                creationtime = Long.parseLong(a);
-                String b = obj.get("senderttl").toString();
-                senderttl = Integer.parseInt(b);
-                String status = obj.get("status").toString();
-                boolean chatresult;
+            try {
+                JSONArray arr = new JSONArray(msgobj);
+                SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    frommobile = obj.get("frommobile").toString();
+                    tomobile = obj.get("tomobile").toString();
+                    data = obj.get("data").toString();
+                    byte[] enc = Utility.encryptClient(data);
+                    String a = obj.get("creationtime").toString();
+                    creationtime = Long.parseLong(a);
+                    String b = obj.get("senderttl").toString();
+                    senderttl = Integer.parseInt(b);
+                    String status = obj.get("status").toString();
+                    boolean chatresult;
 
-                Log.e("FCM MSG", "Data Received" );
+                    Log.e("FCM MSG", "Data Received");
 
-                chatresult = checkforchatlist();
+                    chatresult = checkforchatlist();
 
-                Log.e("FCM MSG", "Result of chatresult" + chatresult );
+                    Log.e("FCM MSG", "Result of chatresult" + chatresult);
 
-                if(chatresult == true)
-                {
-                    ContentValues cv = new ContentValues();
-                    cv.put("frommobile", frommobile);
-                    cv.put("tomobile", tomobile);
-                    cv.put("data", enc);
-                    cv.put("creationtime", creationtime);
-                    cv.put("senderttl", senderttl);
-                    cv.put("status", status);
-                    cv.put("action","r");
-                    database.insertOrThrow("MESSAGE", null, cv);
+                    if (chatresult == true) {
+                        ContentValues cv = new ContentValues();
+                        cv.put("frommobile", frommobile);
+                        cv.put("tomobile", tomobile);
+                        cv.put("data", enc);
+                        cv.put("creationtime", creationtime);
+                        cv.put("senderttl", senderttl);
+                        cv.put("status", status);
+                        cv.put("action", "r");
+                        database.insertOrThrow("MESSAGE", null, cv);
+                    } else if (chatresult == false) {
+
+                    }
+
                 }
-                else if(chatresult == false)
-                {
 
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
+
 
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
 
-
-
-
-        }
-
-
-
-        intent = new Intent(COPA_RESULT);
-        broadcaster.sendBroadcast(intent);
-
-
+            intent = new Intent(COPA_RESULT);
+            broadcaster.sendBroadcast(intent);
     }
+    @Override
+    public void onDestroy() {
+        h.removeCallbacksAndMessages(null);
+    }
+
 
     boolean checkforchatlist()
     {

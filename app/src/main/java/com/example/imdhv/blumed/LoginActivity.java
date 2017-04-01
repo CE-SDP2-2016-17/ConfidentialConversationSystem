@@ -171,6 +171,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             sp.edit().putInt("caid",2 ).apply();
             sp.edit().putString("mynumber",mynumber).apply();
+            sp.edit().putString("username",un).apply();
 
             //SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
             //Cursor resultSet = database.rawQuery("Select * from USERS WHERE status = 'Pending' and frommobile ='" + number + "'", null);
