@@ -40,8 +40,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     ArrayList<String> commonNames=new ArrayList<String>();
 
     ArrayList<String> commonNumbers=new ArrayList<String>();
-    ArrayList<String> commonNames1=new ArrayList<String>();
-    ArrayList<String> commonNumbers1=new ArrayList<String>();
     ArrayAdapter<String> aa;
     SharedPreferences sp;
 
@@ -148,7 +146,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 try{
                     SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db",SQLiteDatabase.CREATE_IF_NECESSARY,null);
-                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT);");
+                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT,key BLOB);");
                     int size=commonNames.size();
                     for(int i=0;i<size;i++)
                     {
@@ -187,9 +185,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             rp.setParam("un", un);
             rp.setMethod("GET");
             mynumber=HttpManager.getData(rp);
-
-
-
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "login");
             rp.setParam("un", un);
@@ -197,7 +192,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             rp.setMethod("GET");
             rp.setParam("fcmid",sp.getString("fcmid",""));
             String ans = HttpManager.getData(rp);
-
             Utility.createdb(LoginActivity.this);
 
             try {

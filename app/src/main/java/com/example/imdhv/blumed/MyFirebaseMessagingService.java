@@ -56,7 +56,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-            mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+            mBuilder.setSmallIcon(R.mipmap.ic_shortcut_chat_bubble);
             mBuilder.setContentTitle("Blumed");
             mBuilder.setContentText("New Message");
             mBuilder.setAutoCancel(true);

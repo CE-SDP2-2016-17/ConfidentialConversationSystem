@@ -7,10 +7,18 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.spec.X509EncodedKeySpec;
+
+import com.example.imdhv.blumed.Utility;
+
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,6 +51,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     class MyTask extends AsyncTask<String, String, String> {
         ProgressDialog pd;
         String un, pw, name, email, mobile;
+        byte[] pb_key,pr_key;
+        KeyPair kp;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -58,6 +68,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             name = etName.getText().toString();
             email = etEmail.getText().toString();
             mobile = etMobile.getText().toString();
+            try {
+                kp = Utility.getKeys();
+                pb_key=kp.getPublic().getEncoded();
+                pr_key=kp.getPrivate().getEncoded();
+            }
+            catch (Exception e)
+            {
+                Toast.makeText(RegisterActivity.this,e.toString(),Toast.LENGTH_LONG).show();
+            }
         }
 
         @Override
@@ -86,6 +105,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             rp.setParam("name", name);
             rp.setParam("email", email);
             rp.setParam("mobile", mobile);
+            rp.setParam("public_key",Utility.bytesToHex(pb_key));
+            rp.setParam("private_key",Utility.bytesToHex(pr_key));
 
 
             rp.setMethod("POST");

@@ -8,8 +8,15 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -44,6 +51,15 @@ public class Utility {
         return new String(decrypted);
     }
 
+    public static KeyPair getKeys() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException,BadPaddingException
+    {
+        KeyPairGenerator kpg;
+        kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(128);
+        KeyPair kp = kpg.genKeyPair();
+        return  kp;
+    }
+
     public static String bytesToHex(byte[] data) {
 
         if (data == null)
@@ -65,9 +81,9 @@ public class Utility {
     public static void createdb(Context c){
         try{
             SQLiteDatabase database = c.openOrCreateDatabase("/sdcard/userlists.db",SQLiteDatabase.CREATE_IF_NECESSARY,null);
-            database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT);");
+            database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT,key String);");
             database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
-            database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT);");
+            database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT,key String);");
         }
         catch(Exception e1){
             Log.e("",e1+"");
