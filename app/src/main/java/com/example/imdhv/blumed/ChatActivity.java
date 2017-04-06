@@ -231,6 +231,11 @@ public class ChatActivity extends AppCompatActivity {
                     chatMessage.setId(id);
                     chatMessage.setMessage(messageText);
                     rpdata = messageText;
+                    try {
+                        rpdata = Utility.ServerEncrypt(rpdata, sp.getString("private_key", ""), getIntent().getStringExtra("key"));
+                    }catch (Exception e){
+                        //Toast.makeText(ChatActivity.this,e.toString(),Toast.LENGTH_LONG).show();
+                    }
                     chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                     chatMessage.setMe(false);
                     id++;
@@ -317,33 +322,22 @@ class MyTask extends AsyncTask<String,String,String>
             RequestPackage rp = new RequestPackage();
             String ans;
             rp.setUri(Utility.serverurl);
-            rp.setParam("type","fcmcheck");
-            rp.setParam("number",number);
+            rp.setParam("type", "sendmessage");
+            rp.setParam("data", rpdata);
+            rp.setParam("frommobile", mynumber.trim());
+            rp.setParam("tomobile", number);
+            rp.setParam("senderttl", rpttl);
             rp.setMethod("POST");
             ans = HttpManager.getData(rp);
-            if (!ans.isEmpty()) {
-                rp.setUri(Utility.serverurl);
-                rp.setParam("type", "sendmessage");
-                rp.setParam("data", rpdata);
-                rp.setParam("frommobile", mynumber.trim());
-                rp.setParam("tomobile", number);
-                rp.setParam("senderttl", rpttl);
-                rp.setMethod("POST");
-                ans = HttpManager.getData(rp);
-
-                try {
-                    SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                    database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
-
-
+            try {
+                SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
                     ContentValues cv = new ContentValues();
                     cv.put("frommobile", mynumber.trim());
                     cv.put("tomobile", number);
                     byte[] enc = Utility.encryptClient(rpdata);
                     cv.put("data", enc);
                     Date ddd = new Date();
-
-
                     cv.put("creationtime", ddd.getTime() / 1000);
                     cv.put("senderttl", rpttl);
                     cv.put("status", "Pending");
@@ -354,11 +348,6 @@ class MyTask extends AsyncTask<String,String,String>
                     e.printStackTrace();
                 }
                 return ans;
-            }
-            else
-            {
-                return "0";
-            }
         }
     }
 }

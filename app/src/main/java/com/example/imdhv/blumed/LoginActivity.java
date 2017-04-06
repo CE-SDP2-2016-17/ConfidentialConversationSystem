@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText etUsername,etPassword;
-    String mynumber;
+    String mynumber,key;
     Button btnLogin;
     TextView tvRegister;
     ArrayList<String> arrlistnames = new ArrayList<String>();
@@ -146,7 +146,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 try{
                     SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db",SQLiteDatabase.CREATE_IF_NECESSARY,null);
-                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT,key BLOB);");
+                    database.execSQL("CREATE TABLE IF NOT EXISTS USERS (Name TEXT,Number TEXT,key STRING);");
                     int size=commonNames.size();
                     for(int i=0;i<size;i++)
                     {
@@ -170,16 +170,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             sp.edit().putInt("caid",2 ).apply();
             sp.edit().putString("mynumber",mynumber).apply();
             sp.edit().putString("username",un).apply();
+            sp.edit().putString("private_key",key).apply();
 
             //SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
             //Cursor resultSet = database.rawQuery("Select * from USERS WHERE status = 'Pending' and frommobile ='" + number + "'", null);
-
         }
 
         @Override
         protected String doInBackground(String... params) {
             RequestPackage rp = new RequestPackage();
-
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "mynumber");
             rp.setParam("un", un);
@@ -195,9 +194,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Utility.createdb(LoginActivity.this);
 
             try {
-                value = Integer.parseInt(ans.trim());
-                if (value > 0) {
-
+                if (!ans.isEmpty()) {
+                    key=ans;
+                    value=1;
                     String newans = getSecondResponse();
                     return newans;
                 }
@@ -243,9 +242,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
             }
-
-
-
             JSONArray jsArray = new JSONArray(arrlistphonenumbers);
             String s1 = jsArray.toString();
             RequestPackage rp = new RequestPackage();
@@ -255,7 +251,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             rp.setMethod("POST");
             String ans = HttpManager.getData(rp);
             return ans;
-            //return null;
         }
     }
 }

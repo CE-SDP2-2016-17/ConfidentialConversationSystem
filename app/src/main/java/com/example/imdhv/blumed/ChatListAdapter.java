@@ -1,8 +1,12 @@
 package com.example.imdhv.blumed;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.style.BackgroundColorSpan;
@@ -85,13 +89,57 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(context,ChatActivity.class);
-                    i.putExtra("number", mItem.number);
-                    i.putExtra("name", mItem.name);
-                    context.startActivity(i);
+                    MyTask2 task2 = new MyTask2();
+                    task2.execute();
                     //Toast.makeText(context,""+mItem.name,Toast.LENGTH_LONG).show();
                 }
             });
+        }
+
+        class MyTask2 extends AsyncTask<String, String, String> {
+            ProgressDialog pd;
+            int value;
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                pd= new ProgressDialog(context);
+                pd.setIndeterminate(true);
+                pd.setCancelable(false);
+                pd.setTitle("Loading...");
+                pd.setMessage("Please Wait...");
+                pd.show();
+            }
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                if(!s.isEmpty()) {
+                    Intent i = new Intent(context, ChatActivity.class);
+
+                    i.putExtra("number", mItem.number);
+                    i.putExtra("name", mItem.name);
+                    i.putExtra("key", s);
+                    //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+                    context.startActivity(i);
+                }
+                else {
+                    Intent i = new Intent(context, ChatActivity.class);
+                    i.putExtra("number", mItem.number);
+                    i.putExtra("name", mItem.name);
+                    context.startActivity(i);
+                    Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            protected String doInBackground(String... params) {
+                RequestPackage rp=new RequestPackage();
+                String ans;
+                rp.setUri(Utility.serverurl);
+                rp.setParam("type","fcmcheck");
+                rp.setParam("number",mItem.number);
+                rp.setMethod("POST");
+                ans = HttpManager.getData(rp);
+                return ans;
+            }
         }
 
         @Override

@@ -1,24 +1,33 @@
 package com.example.imdhv.blumed;
 
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -44,13 +53,8 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
 
     RecyclerView recyclerView;
     EditText et;
-    //ArrayList<String> arrlistnames = new ArrayList<String>();
-    //ArrayList<String> arrlistphonenumbers = new ArrayList<String>();
-    //ArrayList<String> commonNames = new ArrayList<String>();
-    //ArrayList<String> commonNumbers = new ArrayList<String>();
-    //ArrayList<String> commonNames1 = new ArrayList<String>();
-    //ArrayList<String> commonNumbers1 = new ArrayList<String>();
     ChatListAdapter aa;
+    String number;
 
     List<ChatList> lists = new ArrayList<>();
     public ChatListFragment() {
@@ -63,14 +67,9 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_chats, container, false);
-
         recyclerView = (RecyclerView) v.findViewById(R.id.lvChats);
         et = (EditText) v.findViewById(R.id.searchbox1);
-
-
         SQLiteDatabase database = getActivity().openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-
-
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int caid = sp.getInt("caid", 0);
         if (caid > 0) {
@@ -83,12 +82,9 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
                     lists.add(obj);
                 } while (resultSet.moveToNext());
             }
-
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             aa = new ChatListAdapter(lists,getActivity());
             recyclerView.setAdapter(aa);
-
-
         }
 
 
@@ -105,7 +101,6 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after) {
                 // TODO Auto-generated method stub
-
             }
 
             @Override
@@ -116,28 +111,16 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
                     e.printStackTrace();
                 }
                 // TODO Auto-generated method stub
-
             }
         });
-
-
-
         return v;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        String number = (String) parent.getItemAtPosition(position);
-
-        Intent i = new Intent(getActivity(), ChatActivity.class);
-        i.putExtra("number", number);
-        startActivity(i);
-        //getActivity().finish();
-        //Toast.makeText(getActivity(), Integer.toString(position), Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getActivity(), number, Toast.LENGTH_SHORT).show();
+        number = (String) parent.getItemAtPosition(position);
+        //MyTask t=new MyTask();
+        //t.execute();
     }
-
-
 
 }

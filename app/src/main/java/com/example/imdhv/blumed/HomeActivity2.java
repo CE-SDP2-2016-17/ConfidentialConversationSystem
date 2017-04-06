@@ -99,13 +99,13 @@ public class HomeActivity2 extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(HomeActivity2.this,"Logout Successful",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(HomeActivity2.this,"Logout Successful",Toast.LENGTH_SHORT).show();
         }
 
         @Override
         protected String doInBackground(String... params) {
             SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
-            String un=sp.getString("username","");
+            un=sp.getString("username","");
             RequestPackage rp = new RequestPackage();
             String ans;
             rp.setUri(Utility.serverurl);
