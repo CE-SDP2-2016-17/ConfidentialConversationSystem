@@ -4,7 +4,7 @@
 
     <EditTextPreference
         android:capitalize="words"
-        android:defaultValue="0"
+        android:defaultValue="99999"
         android:inputType="number"
         android:key="pref_sender_ttl"
         android:hint="Value in Seconds"
@@ -14,16 +14,7 @@
 
         android:title="Sender TTL" />
 
-    <EditTextPreference
-        android:capitalize="words"
-        android:defaultValue="0"
-        android:inputType="number"
-        android:key="pref_receiver_ttl"
-        android:maxLines="1"
-        android:hint="Value in Seconds"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Receiver TTL" />
+
 
 
 </PreferenceScreen>

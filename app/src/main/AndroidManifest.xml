@@ -75,6 +75,9 @@
 
         <activity android:name=".ChatActivity" />
         <activity android:name=".ChangePasscode"></activity>
+
+        <receiver android:name=".OnAlarmReceive" android:enabled="true" android:exported="true"/>
+
     </application>
 
 </manifest>

@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.style.BackgroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,17 +118,28 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
             int value;
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
-                pd= new ProgressDialog(context);
-                pd.setIndeterminate(true);
-                pd.setCancelable(false);
-                pd.setTitle("Loading...");
-                pd.setMessage("Please Wait...");
-                pd.show();
+                try {
+                    super.onPreExecute();
+                    pd= new ProgressDialog(context);
+                    pd.setIndeterminate(true);
+                    pd.setCancelable(false);
+                    pd.setTitle("Loading...");
+                    pd.setMessage("Please Wait...");
+                    pd.show();
+                }catch (Exception e)
+                {
+                    Log.e("exception contact","In contact adapter");
+                }
+
+
             }
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
+                if(pd!=null){
+                    pd.dismiss();
+                }
+
                 if(!s.isEmpty()) {
 
                     SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);

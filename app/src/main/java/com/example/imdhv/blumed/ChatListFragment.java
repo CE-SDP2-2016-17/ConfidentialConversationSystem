@@ -1,10 +1,12 @@
 package com.example.imdhv.blumed;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,6 +16,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -55,20 +58,30 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
     EditText et;
     ChatListAdapter aa;
     String number;
+    BroadcastReceiver receiver;
 
     List<ChatList> lists = new ArrayList<>();
+
     public ChatListFragment() {
 
     }
 
 
     @Override
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.COPA_RESULT));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View v = inflater.inflate(R.layout.fragment_chats, container, false);
         recyclerView = (RecyclerView) v.findViewById(R.id.lvChats);
         et = (EditText) v.findViewById(R.id.searchbox1);
+
         SQLiteDatabase database = getActivity().openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int caid = sp.getInt("caid", 0);
@@ -86,6 +99,33 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
             aa = new ChatListAdapter(lists,getActivity());
             recyclerView.setAdapter(aa);
         }
+
+
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                List<ChatList> lists1 = new ArrayList<>();
+                SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                int caid = sp.getInt("caid", 0);
+                if (caid > 0) {
+                    Cursor resultSet = database.rawQuery("Select * from CHATLIST", null);
+                    if (resultSet.moveToFirst()) {
+                        do {
+                            ChatList obj = new ChatList();
+                            obj.name = resultSet.getString(0);
+                            obj.number = resultSet.getString(1);
+                            lists1.add(obj);
+                        } while (resultSet.moveToNext());
+                    }
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    aa = new ChatListAdapter(lists1,getActivity());
+                    recyclerView.setAdapter(aa);
+                }
+            }
+        };
+
 
 
 

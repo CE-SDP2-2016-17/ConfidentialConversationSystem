@@ -50,7 +50,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         int caid=sp.getInt("caid",0);
 
             broadcaster = LocalBroadcastManager.getInstance(this);
-            Intent intent = new Intent(this, LockScreenActivity.class);
+
+        Intent intent = new Intent(this, LockScreenActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
             Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

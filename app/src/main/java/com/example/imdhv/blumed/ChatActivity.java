@@ -1,5 +1,6 @@
 package com.example.imdhv.blumed;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -39,6 +42,7 @@ import org.json.JSONObject;
 import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ChatActivity extends AppCompatActivity {
@@ -50,59 +54,76 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<ChatMessage> chatHistory;
     private TextView chatName;
     BroadcastReceiver receiver;
-    int id=1;
-    String rpdata,rptype,rpttl="5";
+    int id = 1;
+    String ID="0";
+    String rpdata, rptype, rpttl = "5";
     ChatMessage chatMessage;
+    protected String TAG = "Bound";
 
     SharedPreferences sp;
-    String number,name,mynumber;
+    String number, name, mynumber;
 
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,new IntentFilter(MyFirebaseMessagingService.COPA_RESULT));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.COPA_RESULT));
     }
 
-    void doit()
-    {
+    void doit() {
         adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
+        Log.e(TAG,"other: "+ number);
+        Log.e(TAG,"my: "+ mynumber);
         SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-        String p ="Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number + "')" + " or (status = 'Pending' and tomobile ='" + number + "')" ;
+        String p = "Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number.trim() + "' and tomobile ='" + mynumber.trim() + "')" + " or (status = 'Pending' and tomobile ='" + number.trim() + "' and frommobile ='" + mynumber.trim() + "')" + " or (status = 'timerstart' and frommobile ='" + number.trim() + "')";
         Cursor resultSet = database.rawQuery(p, null);
-        id=1;
+        id = 1;
         if (resultSet.moveToFirst()) {
             do {
-                String a = resultSet.getString(0);
-                String ba = resultSet.getString(1);
-                String b = resultSet.getString(2);
+                Log.e(TAG,"dummy log");
+                ID = resultSet.getString(0);
+                String frommobile = resultSet.getString(1);
+                String tomobile = resultSet.getString(2);
                 byte[] c = resultSet.getBlob(3);
-                String d = resultSet.getString(4);
-                String e = resultSet.getString(5);
-                String f = resultSet.getString(6);
-                String g = resultSet.getString(7);
+                String creationtime = resultSet.getString(4);
+                String senderttl = resultSet.getString(5);
+                String status = resultSet.getString(6);
+                String action = resultSet.getString(7);
                 ChatMessage chatMessage = new ChatMessage();
 
 
                 chatMessage.setId(id);
-                String text="";
+                String text = "";
                 try {
                     text = Utility.decryptClient(c);
                     //Toast.makeText(ChatActivity.this,text,Toast.LENGTH_LONG).show();
-                }catch (GeneralSecurityException x)
-                {
+                } catch (GeneralSecurityException x) {
                     //Toast.makeText(ChatActivity.this,x.toString(),Toast.LENGTH_LONG).show();
                 }
                 //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMessage(text);
 
                 Date d1 = new Date();
-                d1.setTime((long)(Long.parseLong(d)*1000));
-                chatMessage.setDate((d1.toString()).substring(0,20));
-                if(g.equalsIgnoreCase("s"))
+                d1.setTime((long) (Long.parseLong(creationtime) * 1000));
+                chatMessage.setDate((d1.toString()).substring(0, 20));
+
+
+                if (action.equalsIgnoreCase("s"))
+                {
                     chatMessage.setMe(false);
+                }
                 else
+                {
                     chatMessage.setMe(true);
+                    if(!status.equalsIgnoreCase("timerstart"))
+                    {
+                        setupAlarm(Integer.parseInt(senderttl));
+                        String temp = "UPDATE MESSAGE SET status = 'timerstart' WHERE id ='"+ ID+"'";
+                        database.execSQL(temp);
+                    }
+                }
+
+
 
                 displayMessage(chatMessage);
                 id++;
@@ -111,79 +132,101 @@ public class ChatActivity extends AppCompatActivity {
             while (resultSet.moveToNext());
 
 
-
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG,"on Create");
         setContentView(R.layout.activity_chat);
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         findAllViews();
 
+        //Retrieving the Sender's number and name
         number = getIntent().getStringExtra("number");
         name = getIntent().getStringExtra("name");
+
+        //Retrieving owner number
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        mynumber = sp.getString("mynumber","");
-        rpttl = sp.getString("pref_sender_ttl","");
-        rpttl="50";
+        mynumber = sp.getString("mynumber", "");
+        //Setting Sender's ttl to 50
+        rpttl = sp.getString("pref_sender_ttl", "");
+        //rpttl = "5";
 
         doit();
-       // Toast.makeText(this,rpttl,Toast.LENGTH_SHORT).show();
-       // Toast.makeText(this,mynumber,Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this,rpttl,Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this,mynumber,Toast.LENGTH_SHORT).show();
 
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (this != null) {
+
+                    Log.e(TAG,"dummy log");
+
                     adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
                     messagesContainer.setAdapter(adapter);
+
                     SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                    String p ="Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number + "')" + " or (status = 'Pending' and tomobile ='" + number + "')" ;
+                    String p = "Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number.trim() + "' and tomobile ='" + mynumber.trim() + "')" + " or (status = 'Pending' and tomobile ='" + number.trim() + "' and frommobile ='" + mynumber.trim() + "')" + " or (status = 'timerstart' and frommobile ='" + number.trim() + "' and tomobile = '" +mynumber.trim()+"')";
+                    //String p = "Select * from MESSAGE WHERE (status = 'Pending' and frommobile ='" + number + "')" + " or (status = 'Pending' and tomobile ='" + number + "')" + " or (status = 'timerstart' and tomobile ='" + number + "')";
+
                     Cursor resultSet = database.rawQuery(p, null);
-                    id=1;
+                    id = 1;
                     if (resultSet.moveToFirst()) {
                         do {
-                            String a = resultSet.getString(0);
-                            String ba = resultSet.getString(1);
-                            String b = resultSet.getString(2);
+                            Log.e(TAG,"resultset broadcast");
+                            ID = resultSet.getString(0);
+                            String frommobile = resultSet.getString(1);
+                            String tomobile = resultSet.getString(2);
                             byte[] c = resultSet.getBlob(3);
-                            String d = resultSet.getString(4);
-                            String e = resultSet.getString(5);
-                            String f = resultSet.getString(6);
-                            String g = resultSet.getString(7);
+                            String creationtime = resultSet.getString(4);
+                            String senderttl = resultSet.getString(5);
+                            String status = resultSet.getString(6);
+                            String action = resultSet.getString(7);
                             ChatMessage chatMessage = new ChatMessage();
 
 
                             chatMessage.setId(id);
-                            String text="";
+                            String text = "";
                             try {
                                 text = Utility.decryptClient(c);
-                                Toast.makeText(ChatActivity.this,""+text,Toast.LENGTH_LONG);
-                            }catch (GeneralSecurityException x)
-                            {
-                                Toast.makeText(ChatActivity.this,x.toString(),Toast.LENGTH_LONG);
+                                Toast.makeText(ChatActivity.this, "" + text, Toast.LENGTH_LONG);
+                            } catch (GeneralSecurityException x) {
+                                Toast.makeText(ChatActivity.this, x.toString(), Toast.LENGTH_LONG);
                             }
                             //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                             chatMessage.setMessage(text);
                             Date d1 = new Date();
-                            d1.setTime((long)(Long.parseLong(d)*1000));
-                            chatMessage.setDate((d1.toString()).substring(0,20));
+                            d1.setTime((long) (Long.parseLong(creationtime) * 1000));
+                            chatMessage.setDate((d1.toString()).substring(0, 20));
 
-                            if(g.equalsIgnoreCase("s"))
+                            if (action.equalsIgnoreCase("s"))
+                            {
                                 chatMessage.setMe(false);
+                            }
                             else
+                            {
                                 chatMessage.setMe(true);
+                                if(!status.equalsIgnoreCase("timerstart"))
+                                {
+                                    Log.e(TAG,"broadcast set alarm");
+                                    setupAlarm(Integer.parseInt(senderttl));
+                                    String temp = "UPDATE MESSAGE SET status = 'timerstart' WHERE id ='"+ ID+"'";
+                                    database.execSQL(temp);
+                                }
 
+                            }
 
 
                             displayMessage(chatMessage);
                             id++;
 
+
+
                         }
                         while (resultSet.moveToNext());
-
 
 
                     }
@@ -193,13 +236,11 @@ public class ChatActivity extends AppCompatActivity {
         };
 
 
-
-
         chatName.setText(name);
 
-       // loadDummyHistory();
+        // loadDummyHistory();
 
-        sendBtn.setOnClickListener(new View.OnClickListener(){
+        sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String messageText = messageET.getText().toString();
@@ -225,15 +266,14 @@ public class ChatActivity extends AppCompatActivity {
                         = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                 // now connect with php and pass un, pw to server, server will decide whether correct or not
-                if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
-                {
+                if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
                     chatMessage = new ChatMessage();
                     chatMessage.setId(id);
                     chatMessage.setMessage(messageText);
                     rpdata = messageText;
                     try {
                         rpdata = Utility.ServerEncrypt(rpdata, sp.getString("private_key", ""), getIntent().getStringExtra("key"));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         //Toast.makeText(ChatActivity.this,e.toString(),Toast.LENGTH_LONG).show();
                     }
                     chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
@@ -242,17 +282,15 @@ public class ChatActivity extends AppCompatActivity {
                     messageET.setText("");
                     MyTask t = new MyTask();
                     t.execute();
-                }
-                else
-                {
-                    Toast.makeText(ChatActivity.this,"No Internet Connection",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ChatActivity.this, "No Internet Connection", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
     }
-    private void findAllViews()
-    {
+
+    private void findAllViews() {
         messagesContainer = (ListView) findViewById(R.id.messagesContainer);
         messageET = (EditText) findViewById(R.id.messageEdit);
         sendBtn = (Button) findViewById(R.id.chatSendButton);
@@ -269,33 +307,8 @@ public class ChatActivity extends AppCompatActivity {
         messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 
-    /*private void loadDummyHistory(){
 
-        chatHistory = new ArrayList<ChatMessage>();
-
-        ChatMessage msg = new ChatMessage();
-        msg.setId(1);
-        msg.setMe(false);
-        msg.setMessage("Hi");
-        msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-        chatHistory.add(msg);
-        ChatMessage msg1 = new ChatMessage();
-        msg1.setId(2);
-        msg1.setMe(true);
-        msg1.setMessage("How r u doing???");
-        msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-        chatHistory.add(msg1);
-
-        adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
-        messagesContainer.setAdapter(adapter);
-
-        for(int i=0; i<chatHistory.size(); i++) {
-            ChatMessage message = chatHistory.get(i);
-            displayMessage(message);
-        }
-    }*/
-class MyTask extends AsyncTask<String,String,String>
-    {
+    class MyTask extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -306,14 +319,12 @@ class MyTask extends AsyncTask<String,String,String>
             super.onPostExecute(s);
             //Toast.makeText(ChatActivity.this,s,Toast.LENGTH_SHORT).show();
 
-            if (s!="0") {
+            if (s != "0") {
                 displayMessage(chatMessage);
                 //Toast.makeText(ChatActivity.this,"Done yeah",Toast.LENGTH_SHORT).show();
                 return;
-            }
-            else
-            {
-                Toast.makeText(ChatActivity.this,"Other User is not logged in",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(ChatActivity.this, "Other User is not logged in", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -332,23 +343,41 @@ class MyTask extends AsyncTask<String,String,String>
             try {
                 SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
                 database.execSQL("CREATE TABLE IF NOT EXISTS MESSAGE (id integer primary key autoincrement,frommobile TEXT, tomobile text, data text, creationtime text,senderttl int,status text,action text);");
-                    ContentValues cv = new ContentValues();
-                    cv.put("frommobile", mynumber.trim());
-                    cv.put("tomobile", number);
-                    byte[] enc = Utility.encryptClient(rpdata);
-                    cv.put("data", enc);
-                    Date ddd = new Date();
-                    cv.put("creationtime", ddd.getTime() / 1000);
-                    cv.put("senderttl", rpttl);
-                    cv.put("status", "Pending");
-                    cv.put("action", "s");
-                    database.insertOrThrow("MESSAGE", null, cv);
+                ContentValues cv = new ContentValues();
+                cv.put("frommobile", mynumber.trim());
+                cv.put("tomobile", number);
+                byte[] enc = Utility.encryptClient(rpdata);
+                cv.put("data", enc);
+                Date ddd = new Date();
+                cv.put("creationtime", ddd.getTime() / 1000);
+                cv.put("senderttl", rpttl);
+                cv.put("status", "Pending");
+                cv.put("action", "s");
+                database.insertOrThrow("MESSAGE", null, cv);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return ans;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return ans;
         }
     }
-}
 
+
+    private void setupAlarm(int seconds) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(getBaseContext(), OnAlarmReceive.class);
+        //PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.setAction(Long.toString(System.currentTimeMillis()));
+        intent.putExtra("id", ID);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(ChatActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        Log.e(TAG, "Setup the Alarm");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, seconds);
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+    }
+}
