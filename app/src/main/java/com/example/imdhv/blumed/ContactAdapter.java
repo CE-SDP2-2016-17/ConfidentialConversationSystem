@@ -5,10 +5,12 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.style.BackgroundColorSpan;
@@ -30,11 +32,12 @@ import java.util.Locale;
 
 public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
     String searchText = "";
-    ArrayList<UserList> arraylist = new ArrayList<>();
+    ArrayList<UserList> arraylist = new ArrayList<UserList>();
     private final List<UserList> mValues;
     //  private final OnListFragmentInteractionListener mListener;
    // ContactFragment cf;
     Context context;
+
 
     public ContactAdapter(List<UserList> items, Context context) {
         mValues = items;
@@ -95,6 +98,24 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
 
                     MyTask2 task2 = new MyTask2();
                     task2.execute();
+                    SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    Cursor resultSet = database.rawQuery("Select * from CHATLIST WHERE Number = '" + mItem.number + "'", null);
+                    if(resultSet.moveToFirst()) {
+                    }
+                    else
+                    {
+                        database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT);");
+                        ContentValues cv = new ContentValues();
+                        cv.put("Name", mItem.name);
+                        cv.put("Number",mItem.number);
+                        database.insertOrThrow("CHATLIST", null, cv);
+                        //((Activity)context).finish();
+                    }
+                    Intent i = new Intent(context, ChatActivity.class);
+                    i.putExtra("number", mItem.number);
+                    i.putExtra("name", mItem.name);
+                    //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+                    context.startActivity(i);
 
                     //Toast.makeText(context,""+mItem.number,Toast.LENGTH_LONG).show();
 
@@ -141,39 +162,20 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
                 }
 
                 if(!s.isEmpty()) {
-
-                    SQLiteDatabase database = context.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                    Cursor resultSet = database.rawQuery("Select * from CHATLIST WHERE Number = '" + mItem.number + "'", null);
-                    if(resultSet.moveToFirst()) {
-                    }
-                    else
-                    {
-                        database.execSQL("CREATE TABLE IF NOT EXISTS CHATLIST (Name TEXT,Number TEXT);");
-                        ContentValues cv = new ContentValues();
-                        cv.put("Name", mItem.name);
-                        cv.put("Number",mItem.number);
-                        database.insertOrThrow("CHATLIST", null, cv);
-                        //((Activity)context).finish();
-                    }
-                    Intent i = new Intent(context, ChatActivity.class);
-                    i.putExtra("number", mItem.number);
-                    i.putExtra("name", mItem.name);
-                    i.putExtra("key", s);
-                    //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
-                    context.startActivity(i);
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                    sp.edit().putString("public_key",s).apply();
+                    sp.edit().putInt("Online",1).apply();
                 }
                 else {
-                    Intent i = new Intent(context, ChatActivity.class);
-                    i.putExtra("number", mItem.number);
-                    i.putExtra("name", mItem.name);
-                    context.startActivity(i);
                     Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                    sp.edit().putInt("Online",0).apply();
                 }
             }
             @Override
             protected String doInBackground(String... params) {
                 RequestPackage rp=new RequestPackage();
-                String ans;
+                String ans="";
                 rp.setUri(Utility.serverurl);
                 rp.setParam("type","fcmcheck");
                 rp.setParam("number",mItem.number);

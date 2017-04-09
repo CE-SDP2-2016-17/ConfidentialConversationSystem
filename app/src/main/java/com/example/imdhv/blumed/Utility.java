@@ -29,9 +29,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import static android.R.attr.publicKey;
-
+import android.util.Base64;
 /**
  * Created by imdhv on 26-Feb-17.
  */
@@ -41,7 +40,75 @@ public class Utility {
     private final static String ALGORITM_CLIENT = "Blowfish";
     private final static String KEY_CLIENT = "2356a3a42ba5781f80a72dad3f90aeee8ba93c7637aaf218a8b8c18c";
 
-    public static byte[] encryptClient(String plainText) throws GeneralSecurityException {
+    public static PublicKey stringToPublicKey(String s) {
+
+        byte[] c = null;
+        KeyFactory keyFact = null;
+        PublicKey returnKey = null;
+
+        try {
+            c = Base64.decode(s,Base64.DEFAULT);
+            keyFact = KeyFactory.getInstance("RSA");
+        } catch (Exception e) {
+            System.out.println("Error in Keygen");
+            e.printStackTrace();
+        }
+
+
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(c);
+        try {
+            returnKey = keyFact.generatePublic(x509KeySpec);
+        } catch (Exception e) {
+
+            System.out.println("Error in Keygen2");
+            e.printStackTrace();
+
+        }
+
+        return returnKey;
+
+    }
+    public static PrivateKey stringToPrivateKey(String s) {
+
+        byte[] c = null;
+        KeyFactory keyFact = null;
+        PrivateKey returnKey = null;
+
+        try {
+
+            c = Base64.decode(s,Base64.DEFAULT);
+            keyFact = KeyFactory.getInstance("RSA");
+        } catch (Exception e) {
+
+            System.out.println("Error in first try catch of stringToPrivateKey");
+            e.printStackTrace();
+        }
+
+
+        PKCS8EncodedKeySpec x509KeySpec = new PKCS8EncodedKeySpec(c);
+        try {   //the next line causes the crash
+            returnKey = keyFact.generatePrivate(x509KeySpec);
+        } catch (Exception e) {
+
+            System.out.println("Error in stringToPrivateKey");
+            e.printStackTrace();
+        }
+
+        return returnKey;
+    }
+    public static String publicKeyToString(PublicKey p) {
+
+        byte[] publicKeyBytes = p.getEncoded();
+        return Base64.encodeToString(publicKeyBytes,Base64.DEFAULT);
+
+    }
+    public static String privateKeyToString(PrivateKey p) {
+
+        byte[] privateKeyBytes = p.getEncoded();
+        return Base64.encodeToString(privateKeyBytes,Base64.DEFAULT);
+    }
+
+        public static byte[] encryptClient(String plainText) throws GeneralSecurityException {
 
         SecretKey secret_key = new SecretKeySpec(KEY_CLIENT.getBytes(), ALGORITM_CLIENT);
 
@@ -67,30 +134,30 @@ public class Utility {
     {
         KeyPairGenerator kpg;
         kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(32);
+        kpg.initialize(1024);
         KeyPair kp = kpg.genKeyPair();
         return  kp;
     }
-    public static String ServerEncrypt (String plain,String private_key,String public_key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException
+    public static String ServerEncrypt (String plain,String public_key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException
     {
         byte[] encryptedBytes;
         String encrypted;
         Cipher cipher;
         cipher = Cipher.getInstance("RSA");
-        PublicKey pb= KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(public_key.getBytes()));
+        PublicKey pb= stringToPublicKey(public_key);
         cipher.init(Cipher.ENCRYPT_MODE,pb);
         encryptedBytes = cipher.doFinal(plain.getBytes());
         encrypted = bytesToHex(encryptedBytes);
         return encrypted;
     }
 
-    public static String ServerDecrypt (final String result,String private_key,String public_key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException
+    public static String ServerDecrypt (final String result,String private_key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException
     {
         byte[] decryptedBytes;
         String decrypted;
         Cipher cipher1;
         cipher1=Cipher.getInstance("RSA");
-        PrivateKey pr= KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(private_key.getBytes()));
+        PrivateKey pr= stringToPrivateKey(private_key);
         cipher1.init(Cipher.DECRYPT_MODE,pr);
         decryptedBytes = cipher1.doFinal(result.getBytes());
         decrypted = bytesToHex(decryptedBytes);

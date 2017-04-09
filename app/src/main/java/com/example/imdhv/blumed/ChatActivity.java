@@ -56,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
     int id = 1;
     String ID="0";
-    String rpdata, rptype, rpttl = "5";
+    String rpdata, rptype, rpttl, encText;
     ChatMessage chatMessage;
     protected String TAG = "Bound";
 
@@ -244,6 +244,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String messageText = messageET.getText().toString();
+
                 if (TextUtils.isEmpty(messageText)) {
                     return;
                 }
@@ -267,21 +268,27 @@ public class ChatActivity extends AppCompatActivity {
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                 // now connect with php and pass un, pw to server, server will decide whether correct or not
                 if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-                    chatMessage = new ChatMessage();
-                    chatMessage.setId(id);
-                    chatMessage.setMessage(messageText);
-                    rpdata = messageText;
-                    try {
-                        rpdata = Utility.ServerEncrypt(rpdata, sp.getString("private_key", ""), getIntent().getStringExtra("key"));
-                    } catch (Exception e) {
-                        //Toast.makeText(ChatActivity.this,e.toString(),Toast.LENGTH_LONG).show();
+                    if(sp.getInt("Online",0)==1)
+                    {
+                        chatMessage = new ChatMessage();
+                        chatMessage.setId(id);
+                        chatMessage.setMessage(messageText);
+                        rpdata = messageText;
+                        try {
+                            encText = Utility.ServerEncrypt(rpdata, sp.getString("public_key", ""));
+                        } catch (Exception e) {
+                            Toast.makeText(ChatActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                        }
+                        chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+                        chatMessage.setMe(false);
+                        id++;
+                        messageET.setText("");
+                        MyTask t = new MyTask();
+                        t.execute();
                     }
-                    chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-                    chatMessage.setMe(false);
-                    id++;
-                    messageET.setText("");
-                    MyTask t = new MyTask();
-                    t.execute();
+                    else{
+                        Toast.makeText(ChatActivity.this, "User is not logged in", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     Toast.makeText(ChatActivity.this, "No Internet Connection", Toast.LENGTH_LONG).show();
                 }
@@ -334,7 +341,7 @@ public class ChatActivity extends AppCompatActivity {
             String ans;
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "sendmessage");
-            rp.setParam("data", rpdata);
+            rp.setParam("data", encText);
             rp.setParam("frommobile", mynumber.trim());
             rp.setParam("tomobile", number);
             rp.setParam("senderttl", rpttl);

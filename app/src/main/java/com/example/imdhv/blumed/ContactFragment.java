@@ -50,7 +50,7 @@ public class ContactFragment extends Fragment implements AdapterView.OnItemClick
     ArrayList<String> commonNumbers1 = new ArrayList<String>();
     ContactAdapter aa;
 
-    List<UserList> lists = new ArrayList<>();
+    List<UserList> lists = new ArrayList<UserList>();
     public ContactFragment() {
         // Required empty public constructor
     }

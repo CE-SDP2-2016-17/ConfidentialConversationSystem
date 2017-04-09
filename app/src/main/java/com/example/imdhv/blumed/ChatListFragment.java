@@ -60,7 +60,7 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
     String number;
     BroadcastReceiver receiver;
 
-    List<ChatList> lists = new ArrayList<>();
+    List<ChatList> lists = new ArrayList<ChatList>();
 
     public ChatListFragment() {
 

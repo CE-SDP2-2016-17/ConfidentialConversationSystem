@@ -28,11 +28,12 @@ import java.util.Locale;
 
 public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewHolder> {
     String searchText = "";
-    ArrayList<ChatList> arraylist = new ArrayList<>();
+    ArrayList<ChatList> arraylist = new ArrayList<ChatList>();
     private final List<ChatList> mValues;
     //  private final OnListFragmentInteractionListener mListener;
     // ContactFragment cf;
     Context context;
+
 
     public ChatListAdapter(List<ChatList> items, Context context) {
         mValues = items;
@@ -92,6 +93,10 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
                 public void onClick(View v) {
                     MyTask2 task2 = new MyTask2();
                     task2.execute();
+                    Intent i = new Intent(context, ChatActivity.class);
+                    i.putExtra("number", mItem.number);
+                    i.putExtra("name", mItem.name);
+                    context.startActivity(i);
                     //Toast.makeText(context,""+mItem.name,Toast.LENGTH_LONG).show();
                 }
             });
@@ -104,12 +109,8 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             protected void onPreExecute() {
                 try {
                     super.onPreExecute();
-                    pd= new ProgressDialog(context);
-                    pd.setIndeterminate(true);
-                    pd.setCancelable(false);
-                    pd.setTitle("Loading...");
-                    pd.setMessage("Please Wait...");
-                    pd.show();
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                    sp.edit().putInt("Online",0).apply();
                 }catch (Exception e)
                 {
                     Log.e("exception contact","In chatlist adapter");
@@ -119,25 +120,16 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
 
-                if(pd!=null){
-                    pd.dismiss();
-                }
-
                 if(!s.isEmpty()) {
-                    Intent i = new Intent(context, ChatActivity.class);
-
-                    i.putExtra("number", mItem.number);
-                    i.putExtra("name", mItem.name);
-                    i.putExtra("key", s);
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                    sp.edit().putString("public_key",s).apply();
+                    sp.edit().putInt("Online",1).apply();
                     //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
-                    context.startActivity(i);
-                }
+                    }
                 else {
-                    Intent i = new Intent(context, ChatActivity.class);
-                    i.putExtra("number", mItem.number);
-                    i.putExtra("name", mItem.name);
-                    context.startActivity(i);
                     Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                    sp.edit().putInt("Online",0).apply();
                 }
             }
             @Override

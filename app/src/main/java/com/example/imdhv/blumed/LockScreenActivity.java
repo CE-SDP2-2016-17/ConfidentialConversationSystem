@@ -22,6 +22,15 @@ public class LockScreenActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lock_screen);
         sp= PreferenceManager.getDefaultSharedPreferences(this);
+        int caid;
+        caid = sp.getInt("caid",0);
+        if(caid==0)
+        {
+            Intent i1=new Intent(LockScreenActivity.this,LoginActivity.class);
+            startActivity(i1);
+            finish();
+        }
+        else{
         int pCode;
         pCode=sp.getInt("passCode",0);
         if(pCode!=0)
@@ -36,7 +45,7 @@ public class LockScreenActivity extends AppCompatActivity implements View.OnClic
         passCode = (EditText)findViewById(R.id.passCode);
         EnterPass = (Button)findViewById(R.id.Enter);
         EnterPass.setOnClickListener(this);
-    }
+    }}
 
     @Override
     public void onClick(View v) {

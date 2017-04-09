@@ -2,12 +2,14 @@ package com.example.imdhv.blumed;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -99,7 +101,15 @@ public class HomeActivity2 extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            //Toast.makeText(HomeActivity2.this,"Logout Successful",Toast.LENGTH_SHORT).show();
+            if(pd!=null)pd.dismiss();
+            if(s!="0") {
+                Toast.makeText(HomeActivity2.this,"Logout successful",Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(HomeActivity2.this, LoginActivity.class);
+                startActivity(i);
+                finish();
+                            }
+            else
+                Toast.makeText(HomeActivity2.this,"Internet Error",Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -116,22 +126,59 @@ public class HomeActivity2 extends AppCompatActivity {
             return ans;
         }
     }
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
+                    sp.edit().putInt("userid", 0).apply();
+                    sp.edit().putInt("caid", 0).apply();
+                    SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    database.execSQL("delete from USERS");
+                    database.execSQL("delete from MESSAGE");
+                    MyTask t=new MyTask();
+                    t.execute();
+
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+            }
+        }
+    };
+    DialogInterface.OnClickListener dialogClickListener1 = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    SQLiteDatabase database1 = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    database1.execSQL("delete from CHATLIST");
+                    database1.execSQL("delete from MESSAGE");
+                    Toast.makeText(HomeActivity2.this,"All Chats are cleared",Toast.LENGTH_LONG).show();
+                    Intent i1 = new Intent(HomeActivity2.this, HomeActivity2.class);
+                    finish();
+                    startActivity(i1);
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+            }
+        }
+    };
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuitem_logout:
 
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-                sp.edit().putInt("userid", 0).apply();
-                sp.edit().putInt("caid", 0).apply();
-                SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                database.execSQL("delete from USERS");
-                database.execSQL("delete from MESSAGE");
-                MyTask t=new MyTask();
-                t.execute();
-                Intent i = new Intent(this, LoginActivity.class);
-                startActivity(i);
-                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity2.this);
+                builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
                 break;
             case R.id.menuitem_settings:
                   Intent i2 = new Intent(this, CustomSettings.class);
@@ -144,13 +191,10 @@ public class HomeActivity2 extends AppCompatActivity {
                 break;
 
             case R.id.menuitem_clear_chats:
-                SQLiteDatabase database1 = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                database1.execSQL("delete from CHATLIST");
-                database1.execSQL("delete from MESSAGE");
-                Toast.makeText(HomeActivity2.this,"All Chats are cleared",Toast.LENGTH_LONG).show();
-                Intent i1 = new Intent(this, HomeActivity2.class);
-                finish();
-                startActivity(i1);
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(HomeActivity2.this);
+                builder1.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener1)
+                        .setNegativeButton("No", dialogClickListener1).show();
+                break;
 
             default:
                 break;

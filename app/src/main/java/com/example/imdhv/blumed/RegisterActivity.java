@@ -50,8 +50,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     class MyTask extends AsyncTask<String, String, String> {
         ProgressDialog pd;
-        String un, pw, name, email, mobile;
-        byte[] pb_key,pr_key;
+        String un, pw, name, email, mobile, pb_key, pr_key;
         KeyPair kp;
         @Override
         protected void onPreExecute() {
@@ -70,8 +69,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             mobile = etMobile.getText().toString();
             try {
                 kp = Utility.getKeys();
-                pb_key=kp.getPublic().getEncoded();
-                pr_key=kp.getPrivate().getEncoded();
+                pb_key=Utility.publicKeyToString(kp.getPublic());
+                pr_key=Utility.privateKeyToString(kp.getPrivate());
             }
             catch (Exception e)
             {
@@ -105,8 +104,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             rp.setParam("name", name);
             rp.setParam("email", email);
             rp.setParam("mobile", mobile);
-            rp.setParam("public_key",Utility.bytesToHex(pb_key));
-            rp.setParam("private_key",Utility.bytesToHex(pr_key));
+            rp.setParam("public_key",pb_key);
+            rp.setParam("private_key",pr_key);
 
 
             rp.setMethod("POST");

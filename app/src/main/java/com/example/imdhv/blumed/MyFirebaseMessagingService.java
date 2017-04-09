@@ -36,7 +36,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    String frommobile,tomobile,data,status;
+    String frommobile,tomobile,data,status,decText;
     int senderttl;
     long creationtime;
     private Handler h=new Handler();
@@ -81,7 +81,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     frommobile = obj.get("frommobile").toString();
                     tomobile = obj.get("tomobile").toString();
                     data = obj.get("data").toString();
-                    byte[] enc = Utility.encryptClient(data);
+                    decText = Utility.ServerDecrypt(data,sp.getString("private_key",""));
+                    byte[] enc = Utility.encryptClient(decText);
                     String a = obj.get("creationtime").toString();
                     creationtime = Long.parseLong(a);
                     String b = obj.get("senderttl").toString();
