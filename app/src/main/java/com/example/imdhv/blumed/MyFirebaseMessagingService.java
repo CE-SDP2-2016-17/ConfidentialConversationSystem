@@ -86,7 +86,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     tomobile = obj.get("tomobile").toString();
                     data = obj.get("data").toString();
                     try{
-                        data=Utility.ServerDecrypt(data,Utility.private_key);
+                        data=Utility.ServerDecrypt(data,sp.getString("private_key",""));
                     }
                     catch(Exception e1){
                         data=e1.toString();
