@@ -36,9 +36,11 @@ import android.util.Base64;
  */
 
 public class Utility {
-    public static final String serverurl = "https://blumed.000webhostapp.com/androidsupport.php";
+    //public static final String serverurl = "https://blumed.000webhostapp.com/androidsupport.php";
+    public static final String serverurl = "http://192.168.1.106/androidsupport.php";
     private final static String ALGORITM_CLIENT = "Blowfish";
     private final static String KEY_CLIENT = "2356a3a42ba5781f80a72dad3f90aeee8ba93c7637aaf218a8b8c18c";
+    Context context;
 
     public static PublicKey stringToPublicKey(String s) {
 
@@ -151,7 +153,7 @@ public class Utility {
         return encrypted;
     }
 
-    public static String ServerDecrypt (final String result,String private_key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException
+    public static String ServerDecrypt (String result,String private_key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException
     {
         byte[] decryptedBytes;
         String decrypted;

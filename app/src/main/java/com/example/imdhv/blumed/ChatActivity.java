@@ -163,7 +163,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (this != null) {
 
-                    Log.e(TAG,"dummy log");
+                    //Log.e(TAG,"dummy log");
 
                     adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
                     messagesContainer.setAdapter(adapter);
@@ -192,9 +192,14 @@ public class ChatActivity extends AppCompatActivity {
                             String text = "";
                             try {
                                 text = Utility.decryptClient(c);
-                                Toast.makeText(ChatActivity.this, "" + text, Toast.LENGTH_LONG);
-                            } catch (GeneralSecurityException x) {
-                                Toast.makeText(ChatActivity.this, x.toString(), Toast.LENGTH_LONG);
+                                try {
+                                    text=Utility.ServerDecrypt(text,sp.getString("private_key",""));
+                                }catch(Exception e){
+                                    Toast.makeText(ChatActivity.this,e.toString(), Toast.LENGTH_LONG).show();
+                                }
+                                //Toast.makeText(ChatActivity.this, "" + text, Toast.LENGTH_LONG).show();
+                            } catch (Exception x) {
+                                //Toast.makeText(ChatActivity.this, x.toString(), Toast.LENGTH_LONG).show();
                             }
                             //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                             chatMessage.setMessage(text);
@@ -268,8 +273,8 @@ public class ChatActivity extends AppCompatActivity {
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                 // now connect with php and pass un, pw to server, server will decide whether correct or not
                 if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-                    if(sp.getInt("Online",0)==1)
-                    {
+                    //if(sp.getInt("Online",0)==1)
+                    //{
                         chatMessage = new ChatMessage();
                         chatMessage.setId(id);
                         chatMessage.setMessage(messageText);
@@ -285,10 +290,11 @@ public class ChatActivity extends AppCompatActivity {
                         messageET.setText("");
                         MyTask t = new MyTask();
                         t.execute();
-                    }
-                    else{
-                        Toast.makeText(ChatActivity.this, "User is not logged in", Toast.LENGTH_LONG).show();
-                    }
+                        //Toast.makeText(ChatActivity.this, sp.getString("private_key",""), Toast.LENGTH_LONG).show();
+                    //}
+                    //else{
+                      //  Toast.makeText(ChatActivity.this, "User is not logged in", Toast.LENGTH_LONG).show();
+                    //}
                 } else {
                     Toast.makeText(ChatActivity.this, "No Internet Connection", Toast.LENGTH_LONG).show();
                 }

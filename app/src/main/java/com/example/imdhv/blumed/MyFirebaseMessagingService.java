@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -41,6 +42,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     long creationtime;
     private Handler h=new Handler();
     LocalBroadcastManager broadcaster;
+    Context context;
 
     final static public String COPA_RESULT = "com.example.imdhv.blumed.MyFirebaseMessagingService.REQUEST_PROCESSED";
 
@@ -81,8 +83,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     frommobile = obj.get("frommobile").toString();
                     tomobile = obj.get("tomobile").toString();
                     data = obj.get("data").toString();
-                    decText = Utility.ServerDecrypt(data,sp.getString("private_key",""));
-                    byte[] enc = Utility.encryptClient(decText);
+                    byte[] enc = Utility.encryptClient(data);
                     String a = obj.get("creationtime").toString();
                     creationtime = Long.parseLong(a);
                     String b = obj.get("senderttl").toString();
