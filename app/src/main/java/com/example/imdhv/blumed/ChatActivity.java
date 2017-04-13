@@ -69,6 +69,12 @@ public class ChatActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.COPA_RESULT));
     }
 
+    @Override
+    public void onStop(){
+        super.onStop();
+        finish();
+    }
+
     void doit() {
         adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
@@ -110,6 +116,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 if (action.equalsIgnoreCase("s"))
                 {
+
                     chatMessage.setMe(false);
                 }
                 else
@@ -192,10 +199,10 @@ public class ChatActivity extends AppCompatActivity {
                             String text = "";
                             try {
                                 text = Utility.decryptClient(c);
-                               // try {
-                                 //   text=Utility.ServerDecrypt(text,sp.getString("private_key",""));
+                                //try {
+                                  //  text=Utility.ServerDecrypt(text,sp.getString("private_key",""));
                                 //}catch(Exception e){
-                                 //   Toast.makeText(ChatActivity.this,sp.getString("private_key",""), Toast.LENGTH_LONG).show();
+                                  //  Toast.makeText(ChatActivity.this,sp.getString("private_key",""), Toast.LENGTH_LONG).show();
                                 //}
                                 //Toast.makeText(ChatActivity.this, "" + text, Toast.LENGTH_LONG).show();
                             } catch (Exception x) {
@@ -209,6 +216,7 @@ public class ChatActivity extends AppCompatActivity {
 
                             if (action.equalsIgnoreCase("s"))
                             {
+
                                 chatMessage.setMe(false);
                             }
                             else
@@ -347,7 +355,7 @@ public class ChatActivity extends AppCompatActivity {
             String ans;
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "sendmessage");
-            rp.setParam("data", rpdata);
+            rp.setParam("data", encText);
             rp.setParam("frommobile", mynumber.trim());
             rp.setParam("tomobile", number);
             rp.setParam("senderttl", rpttl);

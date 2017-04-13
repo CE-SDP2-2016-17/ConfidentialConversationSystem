@@ -136,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
             else if(value==2)
             {
-                Toast.makeText(LoginActivity.this, "User is already logged in", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this,"User is already logged in", Toast.LENGTH_LONG).show();
             }
             else{
                Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_LONG).show();
@@ -177,6 +177,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             sp.edit().putString("mynumber",mynumber).apply();
             sp.edit().putString("username",un).apply();
             sp.edit().putString("private_key",key).apply();
+            Utility.private_key=key;
 
             //SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
             //Cursor resultSet = database.rawQuery("Select * from USERS WHERE status = 'Pending' and frommobile ='" + number + "'", null);
@@ -190,15 +191,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             rp.setParam("un", un);
             rp.setMethod("GET");
             mynumber=HttpManager.getData(rp);
-            rp.setParam("type","fcmcheck");
-            rp.setParam("number",mynumber.trim());
-            rp.setMethod("POST");
-            String a=HttpManager.getData(rp);
-            if(a.length()>1)
-            {
-                value=2;
-                return a;
-            }
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "login");
             rp.setParam("un", un);
@@ -208,7 +200,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             String ans = HttpManager.getData(rp);
             Utility.createdb(LoginActivity.this);
             try {
-                if (Integer.parseInt(ans.trim())>0) {
+                if (Integer.parseInt(ans.trim())==1) {
                     rp.setParam("type", "getprivatekey");
                     rp.setParam("un", un);
                     rp.setParam("pw", pw);
@@ -217,6 +209,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     value=1;
                     String newans = getSecondResponse();
                     return newans;
+                }
+                else if(Integer.parseInt(ans.trim())==11)
+                {
+                    value=2;
+                    return "9";
                 }
             }catch(Exception ee){
                 Toast.makeText(LoginActivity.this,"Login error",Toast.LENGTH_LONG).show();

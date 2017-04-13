@@ -162,5 +162,4 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
         //MyTask t=new MyTask();
         //t.execute();
     }
-
 }

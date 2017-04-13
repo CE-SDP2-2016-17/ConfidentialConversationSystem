@@ -36,6 +36,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static com.example.imdhv.blumed.Utility.private_key;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     String frommobile,tomobile,data,status,decText;
     int senderttl;
@@ -83,12 +85,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     frommobile = obj.get("frommobile").toString();
                     tomobile = obj.get("tomobile").toString();
                     data = obj.get("data").toString();
-                    //try{
-                      //  data=Utility.ServerDecrypt("data",sp.getString("private_key",""));
-                    //}
-                    //catch(Exception e1){
-                      //  data=e1.toString();
-                    //}
+                    try{
+                        data=Utility.ServerDecrypt(data,Utility.private_key);
+                    }
+                    catch(Exception e1){
+                        data=e1.toString();
+                    }
                     byte[] enc = Utility.encryptClient(data);
                     String a = obj.get("creationtime").toString();
                     creationtime = Long.parseLong(a);

@@ -71,6 +71,19 @@
 
         android:id="@+id/etRPassword" />
 
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Repeat Password" />
+
+    <EditText
+        android:id="@+id/passwordrepeat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:inputType="textPassword" />
+
     <Button
         android:text="Register"
         android:layout_width="match_parent"

@@ -103,12 +103,6 @@ public class HomeActivity2 extends AppCompatActivity {
             super.onPostExecute(s);
             if(pd!=null)pd.dismiss();
             if(Integer.parseInt(s.trim())==1) {
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
-                sp.edit().putInt("userid", 0).apply();
-                sp.edit().putInt("caid", 0).apply();
-                SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                database.execSQL("delete from USERS");
-                database.execSQL("delete from MESSAGE");
                 Toast.makeText(HomeActivity2.this,"Logout successful",Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(HomeActivity2.this, LoginActivity.class);
                 startActivity(i);
@@ -138,6 +132,12 @@ public class HomeActivity2 extends AppCompatActivity {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
+                    sp.edit().putInt("userid", 0).apply();
+                    sp.edit().putInt("caid", 0).apply();
+                    SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                    database.execSQL("delete from USERS");
+                    database.execSQL("delete from MESSAGE");
                     MyTask t=new MyTask();
                     t.execute();
                     break;

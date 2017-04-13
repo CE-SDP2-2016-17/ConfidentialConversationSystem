@@ -6,11 +6,13 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.security.keystore.KeyGenParameterSpec;
 import android.transition.CircularPropagation;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -18,8 +20,11 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -36,11 +41,12 @@ import android.util.Base64;
  */
 
 public class Utility {
-    //public static final String serverurl = "https://blumed.000webhostapp.com/androidsupport.php";
-    public static final String serverurl = "http://192.168.1.106/androidsupport.php";
+    public static final String serverurl = "https://blumed.000webhostapp.com/androidsupport.php";
+    //public static final String serverurl = "http://192.168.1.106/androidsupport.php";
     private final static String ALGORITM_CLIENT = "Blowfish";
     private final static String KEY_CLIENT = "2356a3a42ba5781f80a72dad3f90aeee8ba93c7637aaf218a8b8c18c";
     Context context;
+    public static String private_key="";
 
     public static PublicKey stringToPublicKey(String s) {
 
@@ -132,11 +138,12 @@ public class Utility {
         return new String(decrypted);
     }
 
-    public static KeyPair getKeys() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException,BadPaddingException
+    public static KeyPair getKeys() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException,BadPaddingException,InvalidAlgorithmParameterException
     {
         KeyPairGenerator kpg;
+        RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(1024, RSAKeyGenParameterSpec.F4);
         kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(1024);
+        kpg.initialize(spec);
         KeyPair kp = kpg.genKeyPair();
         return  kp;
     }
@@ -149,7 +156,7 @@ public class Utility {
         PublicKey pb= stringToPublicKey(public_key);
         cipher.init(Cipher.ENCRYPT_MODE,pb);
         encryptedBytes = cipher.doFinal(plain.getBytes());
-        encrypted = bytesToHex(encryptedBytes);
+        encrypted = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
         return encrypted;
     }
 
@@ -161,8 +168,8 @@ public class Utility {
         cipher1=Cipher.getInstance("RSA");
         PrivateKey pr= stringToPrivateKey(private_key);
         cipher1.init(Cipher.DECRYPT_MODE,pr);
-        decryptedBytes = cipher1.doFinal(result.getBytes());
-        decrypted = bytesToHex(decryptedBytes);
+        decryptedBytes = cipher1.doFinal(Base64.decode(result,Base64.DEFAULT));
+        decrypted = new String(decryptedBytes);
         return decrypted;
     }
 

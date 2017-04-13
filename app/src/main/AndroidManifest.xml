@@ -21,39 +21,60 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity" android:screenOrientation="portrait"
-            android:excludeFromRecents="true"></activity>
-        <activity android:name=".LockScreenActivity" android:screenOrientation="portrait">
+        <activity
+            android:name=".LoginActivity"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LockScreenActivity"
+            android:windowSoftInputMode="stateAlwaysVisible"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HomeActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".UserListActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".RegisterActivity" android:screenOrientation="portrait"/>
         <activity
-            android:name=".LoginReadyActivity" android:screenOrientation="portrait"
-            android:label="@string/title_activity_login_ready" />
-        <activity android:name=".UserDetailActivity"  android:screenOrientation="portrait"/>
-        <activity android:name=".DisplayContactActivity" android:screenOrientation="portrait"/>
-        <activity android:screenOrientation="portrait"
+            android:name=".HomeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".UserListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginReadyActivity"
+            android:label="@string/title_activity_login_ready"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".UserDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DisplayContactActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".HomeActivity2"
             android:label="Blumed"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SettingsActivity" android:screenOrientation="portrait"
+            android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".HomeActivity2">
+            android:parentActivityName=".HomeActivity2"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.imdhv.blumed.HomeActivity2" />
         </activity>
-        <activity android:name=".CustomSettings"  android:screenOrientation="portrait"/>
         <activity
-            android:name=".NewMessageActivity" android:screenOrientation="portrait"
+            android:name=".CustomSettings"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".NewMessageActivity"
             android:label="@string/title_activity_new_message"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
@@ -74,10 +95,14 @@
         </service>
 
         <activity android:name=".ChatActivity" />
-        <activity android:name=".ChangePasscode"></activity>
+        <activity android:name=".ChangePasscode" />
 
-        <receiver android:name=".OnAlarmReceive" android:enabled="true" android:exported="true"/>
+        <receiver
+            android:name=".OnAlarmReceive"
+            android:enabled="true"
+            android:exported="true" />
 
+        <activity android:name=".RSATestActivity"></activity>
     </application>
 
 </manifest>
