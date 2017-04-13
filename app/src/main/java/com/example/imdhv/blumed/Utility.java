@@ -80,20 +80,20 @@ public class Utility {
 
             c = Base64.decode(s,Base64.DEFAULT);
             keyFact = KeyFactory.getInstance("RSA");
-        } catch (Exception e) {
+        } catch (Exception ex) {
 
-            System.out.println("Error in first try catch of stringToPrivateKey");
-            e.printStackTrace();
+            Log.e("Error",ex.toString());
+            ex.printStackTrace();
         }
 
 
         PKCS8EncodedKeySpec x509KeySpec = new PKCS8EncodedKeySpec(c);
         try {   //the next line causes the crash
             returnKey = keyFact.generatePrivate(x509KeySpec);
-        } catch (Exception e) {
+        } catch (Exception ex) {
 
-            System.out.println("Error in stringToPrivateKey");
-            e.printStackTrace();
+            Log.e("Error",ex.toString());
+            ex.printStackTrace();
         }
 
         return returnKey;

@@ -192,11 +192,11 @@ public class ChatActivity extends AppCompatActivity {
                             String text = "";
                             try {
                                 text = Utility.decryptClient(c);
-                                try {
-                                    text=Utility.ServerDecrypt(text,sp.getString("private_key",""));
-                                }catch(Exception e){
-                                    Toast.makeText(ChatActivity.this,e.toString(), Toast.LENGTH_LONG).show();
-                                }
+                               // try {
+                                 //   text=Utility.ServerDecrypt(text,sp.getString("private_key",""));
+                                //}catch(Exception e){
+                                 //   Toast.makeText(ChatActivity.this,sp.getString("private_key",""), Toast.LENGTH_LONG).show();
+                                //}
                                 //Toast.makeText(ChatActivity.this, "" + text, Toast.LENGTH_LONG).show();
                             } catch (Exception x) {
                                 //Toast.makeText(ChatActivity.this, x.toString(), Toast.LENGTH_LONG).show();
@@ -347,7 +347,7 @@ public class ChatActivity extends AppCompatActivity {
             String ans;
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "sendmessage");
-            rp.setParam("data", encText);
+            rp.setParam("data", rpdata);
             rp.setParam("frommobile", mynumber.trim());
             rp.setParam("tomobile", number);
             rp.setParam("senderttl", rpttl);

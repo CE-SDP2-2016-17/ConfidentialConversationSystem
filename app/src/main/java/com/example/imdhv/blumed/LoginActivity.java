@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 pd.dismiss();
             }
 
-            if(value!=0){
+            if(value==1){
 
                 handleSecondResponse(s);
 
@@ -130,6 +130,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Utility.createdb(LoginActivity.this);
 
                 Intent i = new Intent(LoginActivity.this, HomeActivity2.class);
+                //Toast.makeText(LoginActivity.this,sp.getString("private_key",""), Toast.LENGTH_LONG).show();
                 startActivity(i);
                 finish();
             }else{
@@ -167,7 +168,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
 
 
-            sp.edit().putInt("caid",2 ).apply();
+            sp.edit().putInt("caid",2).apply();
             sp.edit().putString("mynumber",mynumber).apply();
             sp.edit().putString("username",un).apply();
             sp.edit().putString("private_key",key).apply();
@@ -188,14 +189,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             rp.setParam("type", "login");
             rp.setParam("un", un);
             rp.setParam("pw", pw);
-            rp.setMethod("GET");
+            rp.setMethod("POST");
             rp.setParam("fcmid",sp.getString("fcmid",""));
             String ans = HttpManager.getData(rp);
             Utility.createdb(LoginActivity.this);
-
             try {
-                if (!ans.isEmpty()) {
-                    key=ans;
+                if (Integer.parseInt(ans.trim())>0) {
+                    rp.setParam("type", "getprivatekey");
+                    rp.setParam("un", un);
+                    rp.setParam("pw", pw);
+                    rp.setMethod("POST");
+                    key=HttpManager.getData(rp);
                     value=1;
                     String newans = getSecondResponse();
                     return newans;

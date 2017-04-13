@@ -83,6 +83,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     frommobile = obj.get("frommobile").toString();
                     tomobile = obj.get("tomobile").toString();
                     data = obj.get("data").toString();
+                    //try{
+                      //  data=Utility.ServerDecrypt("data",sp.getString("private_key",""));
+                    //}
+                    //catch(Exception e1){
+                      //  data=e1.toString();
+                    //}
                     byte[] enc = Utility.encryptClient(data);
                     String a = obj.get("creationtime").toString();
                     creationtime = Long.parseLong(a);
