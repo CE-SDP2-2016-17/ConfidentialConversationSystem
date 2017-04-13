@@ -71,10 +71,15 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onStop(){
+        System.exit(0);
         super.onStop();
-        finish();
     }
+    @Override
+    public void onPause(){
+        System.exit(0);
+        super.onPause();
 
+    }
     void doit() {
         adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
