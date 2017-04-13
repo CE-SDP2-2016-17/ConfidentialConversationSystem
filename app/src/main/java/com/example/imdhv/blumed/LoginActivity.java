@@ -133,7 +133,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 //Toast.makeText(LoginActivity.this,sp.getString("private_key",""), Toast.LENGTH_LONG).show();
                 startActivity(i);
                 finish();
-            }else{
+            }
+            else if(value==2)
+            {
+                Toast.makeText(LoginActivity.this, "User is already logged in", Toast.LENGTH_LONG).show();
+            }
+            else{
                Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_LONG).show();
             }
         }
@@ -185,6 +190,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             rp.setParam("un", un);
             rp.setMethod("GET");
             mynumber=HttpManager.getData(rp);
+            rp.setParam("type","fcmcheck");
+            rp.setParam("number",mynumber.trim());
+            rp.setMethod("POST");
+            String a=HttpManager.getData(rp);
+            if(a.length()>1)
+            {
+                value=2;
+                return a;
+            }
             rp.setUri(Utility.serverurl);
             rp.setParam("type", "login");
             rp.setParam("un", un);

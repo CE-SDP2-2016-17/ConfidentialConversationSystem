@@ -35,12 +35,10 @@ public class HttpManager {
 			 statusCode =  con.getResponseCode();
 			StringBuilder sb = new StringBuilder();
 			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			
 			String line;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
+			while ((line = reader.readLine())!=null) {
+				sb.append(line);
 			}
-			
 			return sb.toString();
 			
 		} catch (Exception e) {
