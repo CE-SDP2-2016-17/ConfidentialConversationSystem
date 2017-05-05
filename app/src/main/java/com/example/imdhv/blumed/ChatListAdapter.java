@@ -124,6 +124,8 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                     sp.edit().putString("public_key",s).apply();
                     sp.edit().putInt("Online",1).apply();
+
+
                     //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
                     }
                 else {

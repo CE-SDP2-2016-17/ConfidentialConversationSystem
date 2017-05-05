@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +51,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         // check sharedpreference
          sp = PreferenceManager.getDefaultSharedPreferences(this);
+
+
 
         int caid = sp.getInt("caid", 0);
         if(caid==2){
@@ -177,6 +180,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             sp.edit().putString("mynumber",mynumber).apply();
             sp.edit().putString("username",un).apply();
             sp.edit().putString("private_key",key).apply();
+            //EditTextPreference lastname=  (EditTextPreference) findPreference("pref_sender_ttl");
+            //lastname.setSummary(sp.getString("pref_sender_ttl",""));
             Utility.private_key=key;
 
             //SQLiteDatabase database = openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);

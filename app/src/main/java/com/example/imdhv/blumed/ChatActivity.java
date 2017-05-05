@@ -163,6 +163,9 @@ public class ChatActivity extends AppCompatActivity {
         mynumber = sp.getString("mynumber", "");
         //Setting Sender's ttl to 50
         rpttl = sp.getString("pref_sender_ttl", "");
+
+
+        Log.e("ttl","The original ttl is : "+ rpttl);
         //rpttl = "5";
 
         doit();
