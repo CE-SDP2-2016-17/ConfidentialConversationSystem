@@ -2,10 +2,13 @@ package com.example.imdhv.blumed;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -132,14 +135,23 @@ public class HomeActivity2 extends AppCompatActivity {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
-                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
-                    sp.edit().putInt("userid", 0).apply();
-                    sp.edit().putInt("caid", 0).apply();
-                    SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-                    database.execSQL("delete from USERS");
-                    database.execSQL("delete from MESSAGE");
-                    MyTask t=new MyTask();
-                    t.execute();
+                    ConnectivityManager connectivityManager
+                            = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                    // now connect with php and pass un, pw to server, server will decide whether correct or not
+                    if(activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+                        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(HomeActivity2.this);
+                        sp.edit().putInt("userid", 0).apply();
+                        sp.edit().putInt("caid", 0).apply();
+                        SQLiteDatabase database = HomeActivity2.this.openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+                        database.execSQL("delete from USERS");
+                        database.execSQL("delete from MESSAGE");
+                        MyTask t = new MyTask();
+                        t.execute();
+                    }
+                    else{
+                        Toast.makeText(HomeActivity2.this,"No Internet Connection",Toast.LENGTH_LONG).show();
+                    }
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:
