@@ -70,6 +70,7 @@ public class ContactFragment extends Fragment implements AdapterView.OnItemClick
         //database.execSQL("delete from USERS");
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.edit().putInt("Online",0).apply();
         int caid = sp.getInt("caid", 0);
         if (caid > 0) {
             Cursor resultSet = database.rawQuery("Select * from USERS", null);

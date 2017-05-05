@@ -71,11 +71,13 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onStop(){
+        sp.edit().putInt("Online",0).apply();
         System.exit(0);
         super.onStop();
     }
     @Override
     public void onPause(){
+        sp.edit().putInt("Online",0).apply();
         System.exit(0);
         super.onPause();
     }

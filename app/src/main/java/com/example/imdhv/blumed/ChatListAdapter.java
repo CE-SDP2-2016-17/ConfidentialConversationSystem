@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -91,8 +93,8 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MyTask2 task2 = new MyTask2();
-                    task2.execute();
+                        MyTask2 task2 = new MyTask2();
+                        task2.execute();
                     Intent i = new Intent(context, ChatActivity.class);
                     i.putExtra("number", mItem.number);
                     i.putExtra("name", mItem.name);
@@ -129,7 +131,7 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
                     //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
                     }
                 else {
-                    Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                     sp.edit().putInt("Online",0).apply();
                 }
