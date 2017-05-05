@@ -56,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
     int id = 1;
     String ID="0";
-    String rpdata, rptype, rpttl, encText;
+    String rpdata, rpttl, encText;
     ChatMessage chatMessage;
     protected String TAG = "Bound";
 
@@ -78,7 +78,6 @@ public class ChatActivity extends AppCompatActivity {
     public void onPause(){
         System.exit(0);
         super.onPause();
-
     }
     void doit() {
         adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
@@ -152,7 +151,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.e(TAG,"on Create");
         setContentView(R.layout.activity_chat);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         findAllViews();
 
         //Retrieving the Sender's number and name
@@ -204,14 +203,8 @@ public class ChatActivity extends AppCompatActivity {
                             String text = "";
                             try {
                                 text = Utility.decryptClient(c);
-                                //try {
-                                  //  text=Utility.ServerDecrypt(text,sp.getString("private_key",""));
-                                //}catch(Exception e){
-                                  //  Toast.makeText(ChatActivity.this,sp.getString("private_key",""), Toast.LENGTH_LONG).show();
-                                //}
-                                //Toast.makeText(ChatActivity.this, "" + text, Toast.LENGTH_LONG).show();
                             } catch (Exception x) {
-                                //Toast.makeText(ChatActivity.this, x.toString(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(ChatActivity.this, x.toString(), Toast.LENGTH_LONG).show();
                             }
                             //chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                             chatMessage.setMessage(text);
@@ -234,60 +227,31 @@ public class ChatActivity extends AppCompatActivity {
                                     String temp = "UPDATE MESSAGE SET status = 'timerstart' WHERE id ='"+ ID+"'";
                                     database.execSQL(temp);
                                 }
-
                             }
-
-
                             displayMessage(chatMessage);
                             id++;
-
-
-
                         }
                         while (resultSet.moveToNext());
-
-
                     }
-
                 }
             }
         };
-
-
         chatName.setText(name);
-
         // loadDummyHistory();
-
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String messageText = messageET.getText().toString();
-
                 if (TextUtils.isEmpty(messageText)) {
                     return;
                 }
-                /*Uri s= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ChatActivity.this);
-                mBuilder.setSmallIcon(R.mipmap.ic_launcher);
-                mBuilder.setContentTitle("Blumed");
-                mBuilder.setContentText("New Message");
-                mBuilder.setAutoCancel(true);
-                mBuilder.setSound(s);
-                mBuilder.setPriority(Notification.PRIORITY_HIGH);
-
-                Intent intent = new Intent(ChatActivity.this, LockScreenActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                PendingIntent pendingIntent = PendingIntent.getActivity(ChatActivity.this,0,intent,PendingIntent.FLAG_ONE_SHOT);
-                mBuilder.setContentIntent(pendingIntent);
-                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(0, mBuilder.build());*/
                 ConnectivityManager connectivityManager
                         = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                 // now connect with php and pass un, pw to server, server will decide whether correct or not
                 if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-                    //if(sp.getInt("Online",0)==1)
-                    //{
+                    if(sp.getInt("Online",0)==1)
+                    {
                         chatMessage = new ChatMessage();
                         chatMessage.setId(id);
                         chatMessage.setMessage(messageText);
@@ -304,10 +268,10 @@ public class ChatActivity extends AppCompatActivity {
                         MyTask t = new MyTask();
                         t.execute();
                         //Toast.makeText(ChatActivity.this, sp.getString("private_key",""), Toast.LENGTH_LONG).show();
-                    //}
-                    //else{
-                      //  Toast.makeText(ChatActivity.this, "User is not logged in", Toast.LENGTH_LONG).show();
-                    //}
+                    }
+                    else{
+                        Toast.makeText(ChatActivity.this, "User is not logged in", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     Toast.makeText(ChatActivity.this, "No Internet Connection", Toast.LENGTH_LONG).show();
                 }
@@ -387,23 +351,16 @@ public class ChatActivity extends AppCompatActivity {
             return ans;
         }
     }
-
-
     private void setupAlarm(int seconds) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(getBaseContext(), OnAlarmReceive.class);
         //PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
         intent.setAction(Long.toString(System.currentTimeMillis()));
         intent.putExtra("id", ID);
-
         PendingIntent pendingIntent = PendingIntent.getBroadcast(ChatActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-
         Log.e(TAG, "Setup the Alarm");
-
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.SECOND, seconds);
-
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-
     }
 }

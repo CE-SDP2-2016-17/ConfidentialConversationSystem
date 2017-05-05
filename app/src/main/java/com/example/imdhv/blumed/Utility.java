@@ -116,7 +116,7 @@ public class Utility {
         return Base64.encodeToString(privateKeyBytes,Base64.DEFAULT);
     }
 
-        public static byte[] encryptClient(String plainText) throws GeneralSecurityException {
+    public static byte[] encryptClient(String plainText) throws GeneralSecurityException {
 
         SecretKey secret_key = new SecretKeySpec(KEY_CLIENT.getBytes(), ALGORITM_CLIENT);
 

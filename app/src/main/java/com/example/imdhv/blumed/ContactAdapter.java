@@ -161,7 +161,7 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
                     pd.dismiss();
                 }
 
-                if(!s.isEmpty()) {
+                if(s.length()>0) {
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                     sp.edit().putString("public_key",s).apply();
                     sp.edit().putInt("Online",1).apply();
@@ -181,7 +181,7 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
                 rp.setParam("number",mItem.number);
                 rp.setMethod("POST");
                 ans = HttpManager.getData(rp);
-                return ans;
+                return ans.trim();
             }
         }
 

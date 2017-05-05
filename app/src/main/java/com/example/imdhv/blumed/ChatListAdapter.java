@@ -120,7 +120,7 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
 
-                if(!s.isEmpty()) {
+                if(s.length()>0) {
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                     sp.edit().putString("public_key",s).apply();
                     sp.edit().putInt("Online",1).apply();
@@ -135,13 +135,13 @@ public class ChatListAdapter  extends RecyclerView.Adapter<ChatListAdapter.ViewH
             @Override
             protected String doInBackground(String... params) {
                 RequestPackage rp=new RequestPackage();
-                String ans;
+                String ans="";
                 rp.setUri(Utility.serverurl);
                 rp.setParam("type","fcmcheck");
                 rp.setParam("number",mItem.number);
                 rp.setMethod("POST");
                 ans = HttpManager.getData(rp);
-                return ans;
+                    return ans.trim();
             }
         }
 

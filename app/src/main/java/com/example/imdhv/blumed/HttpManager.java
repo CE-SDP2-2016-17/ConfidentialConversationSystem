@@ -1,10 +1,7 @@
 package com.example.imdhv.blumed;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -20,7 +17,7 @@ public class HttpManager {
 		if (p.getMethod().equals("GET")) {
 			uri += "?" + p.getEncodedParams();
 		}
-		
+
 		try {
 			URL url = new URL(uri);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -40,21 +37,21 @@ public class HttpManager {
 				sb.append(line);
 			}
 			return sb.toString();
-			
+
 		} catch (Exception e) {
 			if(statusCode == 404){
 				return "Requested resource not found";
-				
+
 			}else if(statusCode == 500){
 				return "Something went wrong at server end";
-				
+
 			}else{
 				return "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet]"+"" +
 						"statusCode"+statusCode+e.toString();
-				
+
 			}
-			
-			
+
+
 		} finally {
 			if (reader != null) {
 				try {
