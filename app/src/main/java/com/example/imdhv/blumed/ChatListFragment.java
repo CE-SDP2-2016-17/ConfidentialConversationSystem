@@ -84,6 +84,7 @@ public class ChatListFragment extends Fragment implements AdapterView.OnItemClic
 
         SQLiteDatabase database = getActivity().openOrCreateDatabase("/sdcard/userlists.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.edit().putInt("Online",0).apply();
         int caid = sp.getInt("caid", 0);
         if (caid > 0) {
             Cursor resultSet = database.rawQuery("Select * from CHATLIST", null);

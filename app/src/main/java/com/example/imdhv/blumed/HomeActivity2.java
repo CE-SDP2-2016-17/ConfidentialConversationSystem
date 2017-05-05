@@ -66,6 +66,8 @@ public class HomeActivity2 extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(this);
+        sp.edit().putInt("Online",0).apply();
 
     }
     @Override
@@ -76,6 +78,8 @@ public class HomeActivity2 extends AppCompatActivity {
         finish();
         Intent i= new Intent(this,HomeActivity2.class);
         startActivity(i);
+        SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(this);
+        sp.edit().putInt("Online",0).apply();
     }
 
 

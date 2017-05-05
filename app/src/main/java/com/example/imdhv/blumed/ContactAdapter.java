@@ -167,7 +167,7 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
                     sp.edit().putInt("Online",1).apply();
                 }
                 else {
-                    Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "user is not logged in", Toast.LENGTH_LONG).show();
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
                     sp.edit().putInt("Online",0).apply();
                 }
